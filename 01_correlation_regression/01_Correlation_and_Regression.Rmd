@@ -11,22 +11,25 @@ output:
     number_sections: yes
     theme: spacelab
     toc: yes
+    toc_depth: 2
   pdf_document:
     code_folding: hide
     df_print: kable
     number_sections: yes
     toc: yes
-    toc_depth: 4
+    toc_depth: 2
 ---
 <style type="text/css">
-body{ font-size: 24px; max-width: 1400px; margin: auto; padding: 1em; }
+body{ font-size: 24px; max-width: 1600px; margin: auto; padding: 1em; }
 code.r{ font-size: 20px; }
+p { padding-top: 8px; padding-bottom: 8px; }
+pre { font-size: 16px; }
 </style>
 
 ```{r setup, include=FALSE}
 if (!require(pacman)) { install.packages("pacman"); library(pacman) }
 p_load(knitr, ppcor, tidyverse, lavaan, modelr, mlbench, 
-       lattice, lm.beta, semPlot, DiagrammeR, relaimpo)
+       lattice, lm.beta, semPlot, DiagrammeR, relaimpo, corrplot)
 knitr::opts_chunk$set(echo = TRUE) #print code by default
 options(digits=3) 
 ```
@@ -45,7 +48,7 @@ options(digits=3)
 
 Structural equation modeling is multivariate regression technique that has grown immensely in popularity over the past two decades. This rise reflects at least three related phenomena: 1) the increasing sophistication of quantitative training in the social sciences; 2) the availability of large multivariate datasets; and 3) the computational power to estimate complex, highly parameterized models.
 
-##What is SEM?
+## What is SEM?
 
 Structural equation modeling is not one thing. Rather, it is a family of techniques for testing multivariate hypotheses about the relationships among observed and (often) latent variables. In general, the goal of SEM is to understand structural patterns in the associations among variables. For example, can twenty items on a depression inventory be thought to measure an underlying (hypothetical) construct?
 
@@ -53,7 +56,7 @@ Critically, SEM allows researchers to test hypotheses about observed variables, 
 
 SEM has two important components: structure and measurement. 
 
-##Structural model
+## Structural model
 
 The structural model represents the relationships among constructs, whether observed or latent. This is closest to standard regression techniques, where believe that one variable causes (or at least is associated with) another.
 
@@ -81,7 +84,7 @@ suppressWarnings(semPaths(mm, style='lisrel', what="diagram", layout = "spring",
 
 Did you notice we just fit our first SEM?! Pretty exciting... I mean, it was technically a path analysis because all variables were observed, but we'll save that discussion for another day.
 
-##Measurement model
+## Measurement model
 
 The measurement model specifies how observed variables are related to each other to form underlying latent variables.
 
@@ -124,12 +127,13 @@ digraph narc {
 
 - The transpose of matrix flips a matrix along its diagonal (transposing rows and columns). It is denoted with the prime operator, $\mathbf{X}'$ and the `t()` function in `R`.
 
-- Matrices are composed of rows and columns (we won't deal with arrays of 3+ dimensions). Rows are the first dimension, columns are the second. So, a matrix composed of $n$ observations and $p$ variables is denoted:
-$$\underset{n \times p}{\mathbf{X}}$$
+- Matrices are composed of rows and columns (we won't deal with arrays of 3+ dimensions). Rows are the first dimension, columns are the second. So, a matrix composed of $n$ observations and $k$ variables is denoted:
+
+$$\underset{n \times k}{\mathbf{X}}$$
 
 In `R`, selecting row `i` in column `j` from matrix `X` is: `X[i,j]`.
 
-- A Row vector is a collection of numbers having *one* row and $m$ columns (i.e., 1 x $m$).
+- A row vector is a collection of numbers having one *row* and $m$ columns (i.e., 1 x $m$).
 
 $$
 \begin{equation}
@@ -137,7 +141,7 @@ $$
 \end{equation}
 $$
 
-- A column vector is a collection of numbers having many rows and *one* column (i.e., $m$ x 1).
+- A column vector is a collection of numbers having many rows and one *column* (i.e., $m$ x 1).
 
 $$
 \begin{equation}
@@ -176,7 +180,7 @@ I will probably screw these up along the way, but I wanted to mention them up fr
 
 We'll use housing price data from Boston's 1970 census to review important concepts in correlation and regression. This is a nice dataset for regression because there are many interdependent variables: crime, pollutants, age of properties, etc.
 
-```{r}
+```{r, fig.width=8, fig.height=8, fig.align='center'}
 #example dataset from mlbench package with home prices in Boston by census tract
 data(BostonHousing2)
 BostonSmall <- BostonHousing2 %>% dplyr::select(
@@ -189,11 +193,18 @@ BostonSmall <- BostonHousing2 %>% dplyr::select(
 n <- nrow(BostonSmall) #number of observations
 k <- ncol(BostonSmall) #number of variables
 
-#show variables
+#scatterplot matrix of variables
 splom(BostonSmall)
 ```
 
-We can use the `cov()` function in R to get a variance-covariance matrix:
+Our dataset, `BostonSmall`, is a data matrix with `r nrow(BostonSmall)` observations on the rows and `r ncol(BostonSmall)` variables on the columns. As noted above, we could notate this in matrix form as:
+
+$$\underset{n \times k}{\mathbf{X}}$$
+
+In a data matrix with $k$ variables, the covariance matrix, $\mathbf{S_{XX}}$, will be $k \times k$ in size. That is, we are computing the relationships among all variables. The sample size (number of rows) influences the precision of the variance-covariance estimates.
+
+We can use the `cov()` function in R to get a sample variance-covariance matrix:
+
 ```{r}
 from_r <- cov(BostonSmall)
 from_r
@@ -205,6 +216,7 @@ $$
 s_{XY} = \frac{\sum{(X-\bar{X})(Y-\bar{Y})}}{N-1}
 $$
 
+Here is the covariance matrix computed manually using the formula above:
 
 ```{r}
 mycov <- function(x, y) {
@@ -223,9 +235,9 @@ cmat
 
 Or we can do the matrix math by hand:
 
-$$\mathbf{S_{XX}} = 1/(N-1)\mathbf{X'X}$$
+$$ \mathbf{S_{XX}} = \frac{1}{(N-1) \mathbf{X}^{*\prime} \mathbf{X}^{*}} $$
 
-if $\mathbf{X}$ is a matrix that is already in deviation form (i.e., each variable is mean-centered).
+if $\mathbf{X^{*}}$ is a matrix that is already in deviation form (i.e., each variable is mean-centered).
 
 ```{r}
 #for the mathy among you...
@@ -245,7 +257,8 @@ C
 ```
 
 # Covariance <-> correlation
-The correlation of x and y is a covariance that has been standardized by the standard deviations of x and y. This yields a scale-insensitive measure of the linear association of x and y.
+
+The correlation of $x$ and $y$ is a covariance that has been standardized by the standard deviations of $x$ and $y$. This yields a scale-insensitive measure of the linear association of $x$ and $y$.
 
 $$r_{XY}= \frac{s_{XY}}{s_{X} s_{Y}}$$
 
@@ -291,27 +304,70 @@ Here's an example of the scientific power we'd like to leverage in SEM (courtesy
 
 ## Consider a correlation matrix of items related to subjective well-being, detachment, and narcissism
 
-![](cormat.png)
+```{r, fig.height=8, fig.width=8, align='center'}
+lower <- '
+   1
+ .53     1
+ .46   .48     1
+ .34   .24   .20     1
+ .07  -.06  -.02   .50     1
+ .24   .13   .15   .53   .60     1
+-.02  -.22  -.12   .17   .09   .10     1
+-.08  -.27  -.14   .16   .07   .06   .75     1
+-.11  -.30  -.13   .12   .03   .00   .72   .80    1
+'
+
+narc.cmat <- getCov(lower, 
+                    names = c("Restrict_Affect", "Withdrawn", "Avoid_Intimacy",
+                              "Grandiose", "Att_Seeking", "Manipulative",
+                              "Happy", "Ideal", "Change_Nothing"))
+
+corrplot(narc.cmat, type="lower", diag=FALSE, 
+         addCoef.col = "black", method="color", number.cex=1)
+```
 
 ## What can SEM bring to this problem?
 
-A crucial point about SEM is that the 'goodness' of a model can be thought of in terms of how well it predicts (captures) the full covariance matrix of the data using fewer parameters. So in a covariance matrix, we have
+A crucial point about SEM is that the 'goodness' of a model can be thought of in terms of how well it predicts (captures) the full covariance matrix of the data using fewer parameters. So in a covariance matrix, we the number of free parameters, $p$, is given by: 
 
 $$p = \frac{k(k+1)}{2}$$
 
-free parameters. That is, we have to estimate each cell in the covariance matrix. In the case of dataset above with 9 variables, we have
+That is, we have to estimate each cell in the covariance matrix. In the case of dataset above with 9 variables, we have 45 parameters:
 
 $$ p = \frac{9 \cdot 10}{2} = 45$$
 
-parameters: 36 covariances, and 9 variances (diagonal). SEM seeks to capture the full covariance matrix $\mathbf{S_{XX}}$ using a model-implied covariance matrix $\hat{\Sigma}$. If this can be done with fewer than 45 parameters, it suggests that there is some structure underlying the covariance matrix that is more parsimonious than a purely unstructured account. This relates to the degrees of freedom in the model, which we will dive into when discussing identification later in the course.
+This reflects 36 covariances and 9 variances (diagonal). SEM seeks to capture the full covariance matrix $\mathbf{S_{XX}}$ using a model-implied covariance matrix $\hat{\mathbf{\Sigma}}$. If this can be done with fewer than 45 parameters, it suggests that there is some structure underlying the covariance matrix that is more parsimonious than a purely unstructured account. This relates to the degrees of freedom in the model, which we will dive into when discussing identification later in the course.
 
 ## Testing a model of covariance structure
 
-We can test how well a candidate model captures the 9 x 9 covariance matrix of these data using fewer than 45 parameters.
+We can test how well a candidate structural equation model captures the 9 x 9 covariance matrix of these data using fewer than 45 parameters. For example, what if we inferred that there latent traits underlie the three narcissism-related items (`Grandiose`, `Att_Seeking`, and `Manipulative`), three detachment-related items (`Restrict_Affect`, `Withdrawn`, `Avoid_Intimacy`), and three subjective wellbeing items (`Happy`, `Ideal`, `Change_Nothing`)? Furthermore, what if we tested the hypothesis that individuals who are more detached and have greater narcissism report lower subjective well-being?
 
-![](pathmodel.png)
+The first consideration -- the presence of latent traits underlying observed responses -- represents a *measurement* question. The second -- the associations among latent variables -- reflects a *structural* question. Here is what we would get from testing such a SEM in `lavaan`. Don't be concerned with understanding the details at this point!
 
-We've represented the full covariance matrix using 22 parameters. Not a bad start! (assuming that it captures all 45 covariance values).
+```{r}
+model_string <- '
+#measurement model
+Detach =~ Restrict_Affect + Withdrawn + Avoid_Intimacy
+Narc =~ Grandiose + Att_Seeking + Manipulative
+Subj_Well =~ Happy + Ideal + Change_Nothing
+
+#structural model
+Subj_Well ~ Detach + Narc
+'
+
+fit_model <- sem(model_string, sample.cov=narc.cmat, sample.nobs=250)
+summary(fit_model, standardized=TRUE)
+```
+
+And this is the graphical expression (notation will be covered later!).
+
+```{r, fig.width=10, fig.height=6, align='center'}
+semPaths(fit_model, what='std', nCharNodes = 8, sizeMan=11, sizeMan2=4, sizeLat = 13, sizeLat2=7,
+         fade=FALSE, fixedStyle = 1, label.cex=1.2, curvePivot=TRUE,
+         edge.color='black', esize=5, edge.label.cex=1)
+```
+
+In this model, we've represented the full covariance matrix using 22 parameters. Not a bad start, assuming that it captures all 45 covariance values!
 
 # Single-predictor regression
 
@@ -322,7 +378,7 @@ That is, the goal of regression is to predict values of the *criterion* variable
 Here's the basic equation:
 $$ \hat{Y} = B_{0} + B_{1}X + \varepsilon $$
 
-The expected change in Y for a one-unit change in X is encoded by $B_1$. Note that by adding $B_0$, we are representing a belief about the mean of $\hat{Y}$. We can re-express $B_1$ in terms of correlation or covariance, as above.
+The expected change in $Y$ for a one-unit change in $X$ is encoded by $B_1$. Note that by adding $B_0$, we are representing a belief about the mean of $\hat{Y}$. We can re-express $B_1$ in terms of correlation or covariance, as above.
 
 First, let's set the roles of *criterion* and *predictor*. Can we estimate the median home price (*criterion*) on the basis of crime (*predictor*)? Let's fit this equation in `R`:
 
@@ -469,7 +525,7 @@ lm.beta(m2)
 
 As Kline notes, there are a few other handy properties here:
 
-### The *unsigned* correlation of predictor and criterion is equal to the *unsigned* correlation of the criterion with the fitted/predicted values
+1. The *unsigned* correlation of predictor and criterion is equal to the *unsigned* correlation of the criterion with the fitted/predicted values
 
 $$ |r_{XY}| = r_{Y\hat{Y}} $$
 
@@ -480,7 +536,7 @@ $$ R_{Y \cdot X_{1...p}} = r_{Y\hat{Y}} $$
 cor.test(fitted(m2), BostonSmall$cmedv)
 ```
 
-### Total variance in $Y$ can be decomposed into the predicted part and residual part
+2. Total variance in $Y$ can be decomposed into the predicted part and residual part
 
 $$ s_{Y}^2 = s_{\hat{Y}}^2 + s_{Y - \hat{Y}}^2 $$
 
@@ -489,7 +545,7 @@ var(BostonSmall$cmedv)
 var(fitted(m2)) + var(resid(m2))
 ```
 
-### The proportion of shared variance between $X$ and $Y$ is the proportion of $Y$ variance explained relative to its total variance
+3. The proportion of shared variance between $X$ and $Y$ is the proportion of $Y$ variance explained relative to its total variance
 
 $$ r_{XY}^2 = \frac{s_{\hat{Y}}^2}{s_{Y}^2} $$
 
@@ -500,7 +556,7 @@ var(fitted(m2)) / var(BostonSmall$cmedv)
 
 # Multiple regression
 
-In single-predictor regression, there are straightforward mappings back to covariance and correlation. As we consider the joint effects of multiple predictors, however, the math gets a bit harder. Conceptually, the goal of multiple (predictor) regression is to quantify the effects of several predictors on a criterion. In multiple regression, each parameter estimate quantifies the partial relationship of a given predictor $X_1$ with the criterion $Y$, controlling for all other predictors $X_{2...p}$. Thus, how much of a change in $Y$ is expected from a unit change in $X1$ at a given level of $X_{2...p}$ (aka 'holding constant' those predictors).
+In single-predictor regression, there are straightforward mappings back to covariance and correlation. As we consider the joint effects of multiple predictors, however, the math gets a bit harder. Conceptually, the goal of multiple (predictor) regression is to quantify the effects of several predictors on a criterion. In multiple regression, each parameter estimate quantifies the partial relationship of a given predictor $X_1$ with the criterion $Y$, controlling for all other predictors $X_{2...p}$. Thus, how much of a change in $Y$ is expected from a unit change in $X_1$ at a given level of $X_{2...p}$ (aka 'holding constant' those predictors).
 
 $$ \hat{Y} = B_0 + B_1 X_1 + B_2 X_2 + B_3 X_3 + ... B_p X_p + \varepsilon $$
 
@@ -550,23 +606,23 @@ Also note that we can consider partial relationships in multiple regression in c
 
 ### Partial correlation
 
-The association of $X1$ and $Y$, controlling for shared variance with $X2$. Note that the goal here is to remove the influence of $X2$ from both variables before considering their association.
+The association of $X_1$ and $Y$, controlling for shared variance with $X_2$. Note that the goal here is to remove the influence of $X_2$ from both variables before considering their association.
 
-$$ r_{Y,X1 \cdot X2} = \frac{r_{Y,X1} - r_{X1,X2}r_{Y,X2}}{\sqrt{(1-r_{X1,X2}^2)(1-r_{Y,X2}^2)}} $$
+$$ r_{Y,X_1 \cdot X_2} = \frac{r_{Y,X_1} - r_{X_1,X_2}r_{Y,X_2}}{\sqrt{(1-r_{X_1,X_2}^2)(1-r_{Y,X_2}^2)}} $$
 
 ### Part (semipartial)
 
-The association of $X1$ with $Y$, controlling for shared variance between $X1$ and $X2$. Importantly, the association of $X2$ with $Y$ is not removed.
+The association of $X_1$ with $Y$, controlling for shared variance between $X_1$ and $X_2$. Importantly, the association of $X_2$ with $Y$ is not removed.
 
-$$ r_{Y(X1 \cdot X2)} = \frac{r_{Y,X1} - r_{Y,X2}r_{X1,X2}}{\sqrt{1-r_{X1,X2}^2}} $$
+$$ r_{Y(X_1 \cdot X_2)} = \frac{r_{Y,X_1} - r_{Y,X_2}r_{X_1,X_2}}{\sqrt{1-r_{X_1,X_2}^2}} $$
 
 ### Graphical expression
 
 ![Venn diagram of shared variance](venn.png)
 
-- $a$ is the part correlation of $X1$ with $Y$, adjusting for $X1-X2$ association.
+- $a$ is the part correlation of $X_1$ with $Y$, adjusting for $X_1-X_2$ association.
 
-- $\frac{a}{a+d}$ is the partial correlation of $X1$ with $Y$, controlling for $X2$.
+- $\frac{a}{a+d}$ is the partial correlation of $X_1$ with $Y$, controlling for $X_2$.
 
 ## Decomposing variance explained in regression (standardized coefficients, part, or partial correlations)
 
@@ -579,7 +635,7 @@ There are additional measures of the relative importance of predictors in a regr
 One intuitive, but flawed measure, of partial association is the product of the standardized coefficient with the correlation of the predictor and the criterion (Hoffman, 1960):
 
 $$
-r^2_{Y,X1\cdot (X_2...X_p)} = \beta_{X_1}r_{Y,X_1}
+r^2_{Y,X_1\cdot (X_2...X_p)} = \beta_{X_1}r_{Y,X_1}
 $$
 
 By using the marginal correlation (i.e., the bivariate relationship, averaging over all other predictors), the sum of these estimates across all predictors equals the model $R^2$.
@@ -678,10 +734,9 @@ summary(m2)
 
 m3 <- lm(y ~ x1 + x2, sim_nocorr)
 summary(m3)
-
 ```
 
-###Non-equivalence of coefficients when predictors are correlated
+### Non-equivalence of coefficients when predictors are correlated
 
 Now add a correlation of 0.6 between the predictors and repeat the various tests:
 ```{r}

@@ -1,0 +1,35 @@
+---
+title: "PSY 597 - Structural Equation Modeling"
+author: "Michael Hallquist"
+date: "Spring 2019"
+output:
+  html_document:
+    df_print: kable
+    mathjax: default
+    number_sections: yes
+    theme: spacelab
+    toc: no
+    fig_width: 9 
+    fig_height: 6 
+---
+<style type="text/css">
+body{ font-size: 20px; max-width: 1600px; margin: auto; padding: 1em; }
+code.r{ font-size: 20px; }
+p { padding-top: 10px; padding-bottom: 10px; }
+pre { font-size: 16px; }
+</style>
+<br/><br/>
+![](https://www.r-project.org/Rlogo.png)
+<br/><br/>
+Welcome to PSY 597 - *Structural Equation Modeling*, taught at Penn State University by Michael Hallquist. This website provides access to lectures for the Spring 2019 session. For access to the `Rmd` files containing all code, see [here](https://github.com/psu-psychology/psy-597-sem-sp2019).
+
+This graduate course is provides an applied introduction to structural equation modeling (SEM) in the social sciences.  The goal is to cover fundamental topics in measurement and structural models and to develop the knowledge to critique applications of SEM in the research literature. Topics will include latent variables, factor models, path analysis, multiple-group analysis, model comparison, and equivalent models. If time permits, students will also be introduced to more advanced topics such as longitudinal SEM, models of change, mixture models, and multilevel SEM. Analyses will be conducted in R using the lavaan package, but the instructor will provide support for testing equivalent models in Mplus individually, if requested. Students are encouraged to use data from new or ongoing research projects for SEM applications in class.
+
+To obtain the latest materials for this class, use `git clone` to download the course repository: 
+`git clone https://github.com/psu-psychology/psy-597-sem-sp2019.git`
+
+If you already cloned a local copy of the repo, you can get the latest updates using `git update.` If all of this git stuff is foreign, I'd recommend a quick skim of this documentation: https://happygitwithr.com
+
+# Lectures
+
+1.  [Correlation and regression](01_correlation_regression/01_Correlation_and_Regression.html)
