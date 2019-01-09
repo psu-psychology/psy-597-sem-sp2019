@@ -1,0 +1,17 @@
+Hi all,
+
+I'm excited to kick off our structural equation modeling course this week! In addition to reviewing the syllabus, we'll focus on a broad conceptual overview of SEM and a review of correlation and regression. On the implementation side, we'll fit models in R using the lavaan package, so I would encourage you to bring a laptop to class with R and Rstudio installed. The primary text for the course is Rex Kline's Principles and Practice of SEM (4th edition). It should be available at the campus bookstore. I've also recently learned that you can read it as an eBook via the PSU library: http://ebookcentral.proquest.com/lib/pensu/detail.action?docID=4000663.
+
+For tomorrow, please read the following:
+
+1) Kline Chapters 1-3
+
+2) Kenny Correlation and Causality Chapters 1 and 2 (PDF posted under W1 folder in Canvas Files section)
+
+Also, please identify an article in your area of research that uses SEM and may relate to why you enrolled in this course. Please prepare a few comments (2 minutes, no slides needed) about the article to share with the class. We will review the breadth of SEM applications and identify things that we collectively need to learn this semester to make the course useful.
+
+Finally, if you aren't comfortable using R for regression, I would suggest taking a looking at this tutorial and trying things out: http://tutorials.iq.harvard.edu/R/Rstatistics/Rstatistics.html (stop at the multilevel section). Having some fluency in R's syntax for regression will be useful as we move into SEM proper.
+
+Best wishes,
+
+Michael

@@ -1,0 +1,18 @@
+Hi all,
+
+A quick reminder that the first homework assignment, which focuses on correlation and regression, is posted under Assignments.
+It is due by next Monday, 1/14/19 at 5pm.
+
+For next week, please read the following (posted under Readings):
+
+1) Kline Chs. 4 and 6
+
+2) Ho Graphical Representation of SEMs
+
+3) Rosseel Lavaan Tutorial sections 1-5
+
+4) Bebis Matrix Algebra review up through, but not including, Kronecker products (pages 1-10)
+
+Look forward to seeing you next week,
+
+Michael

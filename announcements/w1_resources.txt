@@ -1,0 +1,26 @@
+Hi all,
+
+I wanted to follow-up on a few items from our discussion yesterday. In particular, there are several free resources for learning about R, R markdown, and Github that may be useful as you get familiar with these tools (if you're not already).
+
+Resources for learning R:
+
+1.  R for Data Science: https://r4ds.had.co.nz (Excellent full-length introduction to an effective paradigm for working with data in R)
+2.  R Bootcamp 2018 materials: https://psu-psychology.github.io/r-bootcamp-2018/index.html
+3.  Using Github and R together: https://happygitwithr.com
+4.  R markdown basics:
+      - Overview: https://rmarkdown.rstudio.com/index.html
+      - R Markdown cheatsheet: https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf
+      - Video of simple R Markdown setup: https://www.youtube.com/watch?v=DNS7i2m4sB0
+
+I also made two brief videos for how you can obtain the latest course materials using Github Desktop, which is free: https://desktop.github.com.
+
+The videos are called Github_Clone.mov and Github_Pull.mov. Both are located in the Files section of Canvas. As I mention in the video, you only need to clone the class repository once.
+You then use 'pull' to obtain incremental updates as I upload these over the course of the semester.
+
+As a reminder, the course repository is hosted here: https://github.com/psu-psychology/psy-597-sem-sp2019
+
+Please get in touch with Nate or me if you have questions about getting up to speed with these resources.
+As I mentioned, you don't need to be an R guru to succeed in class -- we will give you many examples to work from. But there will be a learning curve in the first few weeks if these tools are unfamiliar.
+
+Best wishes,
+Michael
