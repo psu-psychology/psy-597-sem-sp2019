@@ -33,3 +33,8 @@ If you already cloned a local copy of the repo, you can get the latest updates u
 # Lectures
 
 1.  [Correlation and regression](01_correlation_regression/01_Correlation_and_Regression.html)
+2.  Fundamentals of SEM: notation, conceptualization
+      - [Matrix Algebra Review](02_sem_basics/matrix_algebra_review.html)
+      - [SEM Notation](02_sem_basics/sem_notation.html)
+      
+
