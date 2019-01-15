@@ -11,8 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ##change below to the current working directory on your machine
 
 # basedir <- file.path("~/Box Sync/SPR19_SEM/onyx_tutorial/") #iMac
-# # basedir <- file.path("~/Box/SPR19_SEM/onyx/") #mbp
-# setwd(basedir)
+basedir <- file.path("~/Box/psy-597-sem-sp2019/02_sem_basics/onyx_tutorial/") #mbp
+setwd(basedir)
 
 library(dplyr)
 library(lavaan)
