@@ -135,22 +135,22 @@ In this class, we will typically adopt the 'all-y' LISREL notation in which the 
 
 - $\mathbf{y}_i$: A vector of observed values for the *i*th variable.
 - $\boldsymbol{\eta}_i$: A vector of estimated values of the *i*th latent variable. These are also referred to as factor scores.
-- $\mathbf{\Lambda}_y$ or $\lambda_{1,1}$: Factor loadings of the observed variables $\mathbf{Y}$ onto factors $\boldsymbol{\eta}$. Also conceptualized as regression slopes (observed regressed on latent). Note that if expressed by specific subscripts (e.g., $\lambda_{1,1}$), the first subscript is the observed variable ($y_{1...j}$) and the second subscript is the factor ($\eta_{1...k}$). Thus, $\mathbf{\Lambda}$ is $j \times k$ in size.
+- $\boldsymbol{\Lambda}_y$ or $\lambda_{1,1}$: Factor loadings of the observed variables $\mathbf{Y}$ onto factors $\boldsymbol{\eta}$. Also conceptualized as regression slopes (observed regressed on latent). Note that if expressed by specific subscripts (e.g., $\lambda_{1,1}$), the first subscript is the observed variable ($y_{1...j}$) and the second subscript is the factor ($\eta_{1...k}$). Thus, $\mathbf{\Lambda}$ is $j \times k$ in size.
 - $\mathbf{\Theta_\varepsilon}$ or $\mathbf{\varepsilon}_i$: The variance-covariance matrix for all observed variables. Also includes covariances among errors. The diagonal will contain error variances for endogenous observed variables.
-- $\mathbf{\zeta}_i$: vector of disturbances in endogenous variables (i.e., residual variability due to unmeasured causes).
-- $\mathbf{\Psi}$: covariance matrix among latent variables. Note that the disturbances for endogenous variables fall along the diagonal.
+- $\boldsymbol{\zeta}_i$: vector of disturbances in endogenous variables (i.e., residual variability due to unmeasured causes).
+- $\boldsymbol{\Psi}$: covariance matrix among latent variables. Note that the disturbances for endogenous variables fall along the diagonal.
 - $\mathbf{B}$: The matrix of regression coefficients.
 
 ### Lavaan matrix naming conventions
 
 In `lavaan`, the names of these parameter matrices largely follow the LISREL all-y notation.
 
-- nu: Dependent variable (i.e., y's) intercepts
-- lambda: Factor loadings
-- theta: (residual) variance-covariance matrix of observed dependent variables
-- alpha: latent means (or intercepts)
-- beta: regression coefficients (structural model)
-- psi: variance-covariance matrix of latent variables
+- **lambda**: Factor loadings
+- **theta**: (residual) variance-covariance matrix of observed dependent variables
+- **psi**: variance-covariance matrix of latent variables
+- **beta**: regression coefficients (structural model)
+- **nu**: Intercepts/means of observed dependent variables (i.e., y's) -- only if mean structure is modeled
+- **alpha**: latent means (or intercepts) -- only if mean structure is modeled
 
 ## Walking between equations and diagrams
 
@@ -218,7 +218,7 @@ y_{6,s}
 \end{bmatrix}
 $$
 
-Even more compact, we can distill the notation above into a single matrix equation for the individual $s$'s predicted scores on all $y$ variables:
+Even more compact, we can distill the notation above into a single matrix equation for the predicted scores of an individual $s$ on all $y$ variables:
 
 $$
 \boldsymbol{y}_s = \boldsymbol{\Lambda}_y \boldsymbol{\eta}_s + \boldsymbol{\varepsilon}_s
@@ -226,15 +226,15 @@ $$
 
 ### Similarities to regression equations
 
-Note that our model-predicted scores on $y$ for a given individual $s$ do not have an expectation of the value when the factor scores $\eta$ are zero. This corresponds to the default 'vanilla' SEM where the means are not explicitly part of the model representation. Rather, the model is only tasked with explaining the sample variance-covariance matrix, $\mathbf{S_{XX}}$.
+Note that our model-predicted scores on all $y$ for a given individual $s$ do not have an expectation of the value when the factor scores, $\boldsymbol{\eta}$, are zero. This corresponds to the default 'vanilla' SEM where the means are not explicitly part of the model representation. Rather, the model is only tasked with explaining the sample variance-covariance matrix, $\mathbf{S_{XX}}$.
 
-As we'll return to later, we can add mean structure to the model, typically annotated as $\boldsymbol{\tau}$.
+As we'll return to later, we can add mean structure to the model. For example, the $\boldsymbol{\nu}$ vector captures the intercepts for observed endogenous variables such as indicators of a factor.
 
 $$
 \begin{align*}
-\textrm{No means:} \quad & y_s = \boldsymbol{\Lambda}_y \eta_s + \varepsilon_s \\
-\textrm{Means:} \quad & y_s = \tau_y + \boldsymbol{\Lambda}_y \eta_s + \varepsilon_s \\
-\textrm{Regression:} \quad & y_s = \beta_0 + \beta_1 x_s + \varepsilon_s
+\textrm{No means:} \quad & \boldsymbol{y}_s = \boldsymbol{\Lambda}_y \boldsymbol{\eta}_s + \boldsymbol{\varepsilon}_s \\
+\textrm{Means:} \quad & \boldsymbol{y}_s = \boldsymbol{\nu}_y + \boldsymbol{\Lambda}_y \boldsymbol{\eta}_s + \boldsymbol{\varepsilon}_s \\
+\textrm{Univariate regression:} \quad & y_{i,s} = \beta_{0,i} + \beta_{1,i} x_{i,s} + \varepsilon_{i,s}
 \end{align*}
 $$
 

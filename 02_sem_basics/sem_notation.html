@@ -2754,8 +2754,8 @@ Dep_Sev [label=&#39;Depression Severity&#39;, xlabel=&#39;Endogenous&#39;];
 CBT -&gt; Rumination; Rumination -&gt; Dep_Sev;
 
 }&quot;)</code></pre>
-<div id="htmlwidget-ab633a1541728dabe18f" style="width:672px;height:480px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ab633a1541728dabe18f">{"x":{"diagram":"digraph DAG {\n\ngraph [bgcolor=transparent, layout=dot, overlap=false]\n\nnode [shape = box, fontcolor=gray25 color=gray80]\n\nnode [fontname=\"Helvetica\"]\nCBT [label=\"CBT\", xlabel=\"Exogenous\"];\nRumination [label=\"Rumination\", xlabel=\"Endogenous\"]; \nDep_Sev [label=\"Depression Severity\", xlabel=\"Endogenous\"];\n\nCBT -> Rumination; Rumination -> Dep_Sev;\n\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-020265874b1f66514a0f" style="width:672px;height:480px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-020265874b1f66514a0f">{"x":{"diagram":"digraph DAG {\n\ngraph [bgcolor=transparent, layout=dot, overlap=false]\n\nnode [shape = box, fontcolor=gray25 color=gray80]\n\nnode [fontname=\"Helvetica\"]\nCBT [label=\"CBT\", xlabel=\"Exogenous\"];\nRumination [label=\"Rumination\", xlabel=\"Endogenous\"]; \nDep_Sev [label=\"Depression Severity\", xlabel=\"Endogenous\"];\n\nCBT -> Rumination; Rumination -> Dep_Sev;\n\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="free-fixed-and-constrained-parameters" class="section level1">
 <h1><span class="header-section-number">5</span> Free, fixed, and constrained parameters</h1>
@@ -2794,10 +2794,10 @@ CBT -&gt; Rumination; Rumination -&gt; Dep_Sev;
 <ul>
 <li><span class="math inline">\(\mathbf{y}_i\)</span>: A vector of observed values for the <em>i</em>th variable.</li>
 <li><span class="math inline">\(\boldsymbol{\eta}_i\)</span>: A vector of estimated values of the <em>i</em>th latent variable. These are also referred to as factor scores.</li>
-<li><span class="math inline">\(\mathbf{\Lambda}_y\)</span> or <span class="math inline">\(\lambda_{1,1}\)</span>: Factor loadings of the observed variables <span class="math inline">\(\mathbf{Y}\)</span> onto factors <span class="math inline">\(\boldsymbol{\eta}\)</span>. Also conceptualized as regression slopes (observed regressed on latent). Note that if expressed by specific subscripts (e.g., <span class="math inline">\(\lambda_{1,1}\)</span>), the first subscript is the observed variable (<span class="math inline">\(y_{1...j}\)</span>) and the second subscript is the factor (<span class="math inline">\(\eta_{1...k}\)</span>). Thus, <span class="math inline">\(\mathbf{\Lambda}\)</span> is <span class="math inline">\(j \times k\)</span> in size.</li>
+<li><span class="math inline">\(\boldsymbol{\Lambda}_y\)</span> or <span class="math inline">\(\lambda_{1,1}\)</span>: Factor loadings of the observed variables <span class="math inline">\(\mathbf{Y}\)</span> onto factors <span class="math inline">\(\boldsymbol{\eta}\)</span>. Also conceptualized as regression slopes (observed regressed on latent). Note that if expressed by specific subscripts (e.g., <span class="math inline">\(\lambda_{1,1}\)</span>), the first subscript is the observed variable (<span class="math inline">\(y_{1...j}\)</span>) and the second subscript is the factor (<span class="math inline">\(\eta_{1...k}\)</span>). Thus, <span class="math inline">\(\mathbf{\Lambda}\)</span> is <span class="math inline">\(j \times k\)</span> in size.</li>
 <li><span class="math inline">\(\mathbf{\Theta_\varepsilon}\)</span> or <span class="math inline">\(\mathbf{\varepsilon}_i\)</span>: The variance-covariance matrix for all observed variables. Also includes covariances among errors. The diagonal will contain error variances for endogenous observed variables.</li>
-<li><span class="math inline">\(\mathbf{\zeta}_i\)</span>: vector of disturbances in endogenous variables (i.e., residual variability due to unmeasured causes).</li>
-<li><span class="math inline">\(\mathbf{\Psi}\)</span>: covariance matrix among latent variables. Note that the disturbances for endogenous variables fall along the diagonal.</li>
+<li><span class="math inline">\(\boldsymbol{\zeta}_i\)</span>: vector of disturbances in endogenous variables (i.e., residual variability due to unmeasured causes).</li>
+<li><span class="math inline">\(\boldsymbol{\Psi}\)</span>: covariance matrix among latent variables. Note that the disturbances for endogenous variables fall along the diagonal.</li>
 <li><span class="math inline">\(\mathbf{B}\)</span>: The matrix of regression coefficients.</li>
 </ul>
 </div>
@@ -2805,12 +2805,12 @@ CBT -&gt; Rumination; Rumination -&gt; Dep_Sev;
 <h3><span class="header-section-number">6.3.2</span> Lavaan matrix naming conventions</h3>
 <p>In <code>lavaan</code>, the names of these parameter matrices largely follow the LISREL all-y notation.</p>
 <ul>
-<li>nu: Dependent variable (i.e., y’s) intercepts</li>
-<li>lambda: Factor loadings</li>
-<li>theta: (residual) variance-covariance matrix of observed dependent variables</li>
-<li>alpha: latent means (or intercepts)</li>
-<li>beta: regression coefficients (structural model)</li>
-<li>psi: variance-covariance matrix of latent variables</li>
+<li><strong>lambda</strong>: Factor loadings</li>
+<li><strong>theta</strong>: (residual) variance-covariance matrix of observed dependent variables</li>
+<li><strong>psi</strong>: variance-covariance matrix of latent variables</li>
+<li><strong>beta</strong>: regression coefficients (structural model)</li>
+<li><strong>nu</strong>: Intercepts/means of observed dependent variables (i.e., y’s) – only if mean structure is modeled</li>
+<li><strong>alpha</strong>: latent means (or intercepts) – only if mean structure is modeled</li>
 </ul>
 </div>
 </div>
@@ -2873,19 +2873,19 @@ y_{6,s}
 \varepsilon_{6,s}
 \end{bmatrix}
 \]</span></p>
-<p>Even more compact, we can distill the notation above into a single matrix equation for the individual <span class="math inline">\(s\)</span>’s predicted scores on all <span class="math inline">\(y\)</span> variables:</p>
+<p>Even more compact, we can distill the notation above into a single matrix equation for the predicted scores of an individual <span class="math inline">\(s\)</span> on all <span class="math inline">\(y\)</span> variables:</p>
 <p><span class="math display">\[
 \boldsymbol{y}_s = \boldsymbol{\Lambda}_y \boldsymbol{\eta}_s + \boldsymbol{\varepsilon}_s
 \]</span></p>
 <div id="similarities-to-regression-equations" class="section level3">
 <h3><span class="header-section-number">6.5.1</span> Similarities to regression equations</h3>
-<p>Note that our model-predicted scores on <span class="math inline">\(y\)</span> for a given individual <span class="math inline">\(s\)</span> do not have an expectation of the value when the factor scores <span class="math inline">\(\eta\)</span> are zero. This corresponds to the default ‘vanilla’ SEM where the means are not explicitly part of the model representation. Rather, the model is only tasked with explaining the sample variance-covariance matrix, <span class="math inline">\(\mathbf{S_{XX}}\)</span>.</p>
-<p>As we’ll return to later, we can add mean structure to the model, typically annotated as <span class="math inline">\(\boldsymbol{\tau}\)</span>.</p>
+<p>Note that our model-predicted scores on all <span class="math inline">\(y\)</span> for a given individual <span class="math inline">\(s\)</span> do not have an expectation of the value when the factor scores, <span class="math inline">\(\boldsymbol{\eta}\)</span>, are zero. This corresponds to the default ‘vanilla’ SEM where the means are not explicitly part of the model representation. Rather, the model is only tasked with explaining the sample variance-covariance matrix, <span class="math inline">\(\mathbf{S_{XX}}\)</span>.</p>
+<p>As we’ll return to later, we can add mean structure to the model. For example, the <span class="math inline">\(\boldsymbol{\nu}\)</span> vector captures the intercepts for observed endogenous variables such as indicators of a factor.</p>
 <p><span class="math display">\[
 \begin{align*}
-\textrm{No means:} \quad &amp; y_s = \boldsymbol{\Lambda}_y \eta_s + \varepsilon_s \\
-\textrm{Means:} \quad &amp; y_s = \tau_y + \boldsymbol{\Lambda}_y \eta_s + \varepsilon_s \\
-\textrm{Regression:} \quad &amp; y_s = \beta_0 + \beta_1 x_s + \varepsilon_s
+\textrm{No means:} \quad &amp; \boldsymbol{y}_s = \boldsymbol{\Lambda}_y \boldsymbol{\eta}_s + \boldsymbol{\varepsilon}_s \\
+\textrm{Means:} \quad &amp; \boldsymbol{y}_s = \boldsymbol{\nu}_y + \boldsymbol{\Lambda}_y \boldsymbol{\eta}_s + \boldsymbol{\varepsilon}_s \\
+\textrm{Univariate regression:} \quad &amp; y_{i,s} = \beta_{0,i} + \beta_{1,i} x_{i,s} + \varepsilon_{i,s}
 \end{align*}
 \]</span></p>
 </div>

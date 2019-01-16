@@ -1,0 +1,7 @@
+Hi all,
+
+For next week, please read Kline Ch. 7. In the readings folder on Canvas, please also read Kenny's chapter on identification and the Lei 2007 overview article on SEM. Finally, please read section 6 (brief) of the lavaan tutorial. We'll be digging into lavaan syntax much more deeply in the next class, so it would be good to have some exposure to the pieces of the software.
+
+Look forward to talking with you next week,
+
+Michael
