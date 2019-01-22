@@ -85,7 +85,7 @@ Note that the variance of A is exogenous, but estimated. More specifically, it w
 
 # Model-implied covariance
 
-Use `fitted()` to obtain model-implied covariance matrix, $\boldsymbol{\Sigma}(\hat{\boldsymbol{\theta}})$:
+Use `fitted()` to obtain the model-implied covariance matrix, $\boldsymbol{\Sigma}(\hat{\boldsymbol{\theta}})$:
 
 ```{r}
 fitted(m)
@@ -113,7 +113,7 @@ modificationIndices(m)
 
 ## Equivalent models
 
-We will return to the issue of models that fit the data equall well, but it's important to note that in this case, there is only one degree of freedom, and four equally good possibilities for capturing the relationship between A and C. This highlights the importance of having clear theoretical predictions about which variables are correlated versus which are likely to be (weak) causes or effects. As in regression, one can reverse predictor versus criterion with minimal change in syntax, but the choice to do so should be *theoretically* motivated. Likewise, in SEM, if one does now have clear predictions about the relationship between two variables, sometimes an undirected covariance between them is the appropriately weak parameterization.
+We will return to the issue of models that fit the data equally well, but it's important to note that in this case, there is only one degree of freedom, and four equally good possibilities for capturing the relationship between A and C. This highlights the importance of having clear theoretical predictions about which variables are correlated versus which are likely to be (weak) causes or effects. As in regression, one can reverse predictor versus criterion with minimal change in syntax, but the choice to do so should be *theoretically* motivated. Likewise, in SEM, if one does now have clear predictions about the relationship between two variables, sometimes an undirected covariance between them is the appropriately weak parameterization.
 
 ```{r}
 syn2 <- '

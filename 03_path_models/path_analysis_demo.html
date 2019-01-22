@@ -480,14 +480,14 @@ psych::describe(abc)</code></pre>
 <td align="right">1000</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">-0.011</td>
-<td align="right">-0.001</td>
-<td align="right">1.050</td>
-<td align="right">-2.89</td>
-<td align="right">2.89</td>
-<td align="right">5.78</td>
-<td align="right">0.005</td>
-<td align="right">-0.208</td>
+<td align="right">-0.022</td>
+<td align="right">-0.017</td>
+<td align="right">1.081</td>
+<td align="right">-2.82</td>
+<td align="right">3.52</td>
+<td align="right">6.34</td>
+<td align="right">0.190</td>
+<td align="right">-0.071</td>
 <td align="right">0.032</td>
 </tr>
 <tr class="even">
@@ -496,14 +496,14 @@ psych::describe(abc)</code></pre>
 <td align="right">1000</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">0.006</td>
-<td align="right">-0.003</td>
-<td align="right">0.958</td>
-<td align="right">-3.32</td>
-<td align="right">3.02</td>
-<td align="right">6.35</td>
-<td align="right">0.006</td>
-<td align="right">0.213</td>
+<td align="right">0.029</td>
+<td align="right">0.010</td>
+<td align="right">1.056</td>
+<td align="right">-2.96</td>
+<td align="right">2.81</td>
+<td align="right">5.78</td>
+<td align="right">-0.071</td>
+<td align="right">-0.296</td>
 <td align="right">0.032</td>
 </tr>
 <tr class="odd">
@@ -512,14 +512,14 @@ psych::describe(abc)</code></pre>
 <td align="right">1000</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">0.020</td>
-<td align="right">0.008</td>
-<td align="right">0.977</td>
-<td align="right">-3.09</td>
-<td align="right">3.24</td>
-<td align="right">6.33</td>
-<td align="right">-0.037</td>
-<td align="right">0.070</td>
+<td align="right">0.023</td>
+<td align="right">0.003</td>
+<td align="right">0.969</td>
+<td align="right">-3.50</td>
+<td align="right">3.61</td>
+<td align="right">7.11</td>
+<td align="right">-0.002</td>
+<td align="right">0.035</td>
 <td align="right">0.032</td>
 </tr>
 </tbody>
@@ -662,7 +662,7 @@ summary(m)</code></pre>
 <td align="right">0</td>
 <td align="left"></td>
 <td align="left">.p4.</td>
-<td align="right">0.500</td>
+<td align="right">0.499</td>
 <td align="right">0.509</td>
 <td align="right">0.023</td>
 </tr>
@@ -768,14 +768,14 @@ summary(m)</code></pre>
 </div>
 <div id="model-implied-covariance" class="section level1">
 <h1><span class="header-section-number">5</span> Model-implied covariance</h1>
-<p>Use <code>fitted()</code> to obtain model-implied covariance matrix, <span class="math inline">\(\boldsymbol{\Sigma}(\hat{\boldsymbol{\theta}}\)</span>:</p>
+<p>Use <code>fitted()</code> to obtain the model-implied covariance matrix, <span class="math inline">\(\boldsymbol{\Sigma}(\hat{\boldsymbol{\theta}})\)</span>:</p>
 <pre class="r"><code>fitted(m)</code></pre>
 <pre><code>## $cov
 ##   B     C     A    
 ## B 0.999            
 ## C 0.699 0.999      
 ## A 0.200 0.140 0.999</code></pre>
-<p>Notice how low the covariance is between A and C compared to our groundtruth value of 0.7. That is, the association between A and C is not fully explained by the indirect association of A with C via B.</p>
+<p>Notice how low the covariance is between A and C compared to our groundtruth value of 0.7. That is, the association between A and C is not fully explained by the indirect association of A with C via B. Also note that the matrix order is not necessarily the same as the sample covariance matrix. This is just a trivial rearrangement of the row/column order, not something meaningful.</p>
 </div>
 <div id="sample-covariance" class="section level1">
 <h1><span class="header-section-number">6</span> Sample covariance</h1>
@@ -856,7 +856,7 @@ summary(m)</code></pre>
 </div>
 <div id="equivalent-models" class="section level2">
 <h2><span class="header-section-number">7.1</span> Equivalent models</h2>
-<p>We will return to the issue of models that fit the data equall well, but it’s important to note that in this case, there is only one degree of freedom, and four equally good possibilities for capturing the relationship between A and C. This highlights the importance of having clear theoretical predictions about which variables are correlated versus which are likely to be (weak) causes or effects. As in regression, one can reverse predictor versus criterion with minimal change in syntax, but the choice to do so should be <em>theoretically</em> motivated. Likewise, in SEM, if one does now have clear predictions about the relationship between two variables, sometimes an undirected covariance between them is the appropriately weak parameterization.</p>
+<p>We will return to the issue of models that fit the data equally well, but it’s important to note that in this case, there is only one degree of freedom, and four equally good possibilities for capturing the relationship between A and C. This highlights the importance of having clear theoretical predictions about which variables are correlated versus which are likely to be (weak) causes or effects. As in regression, one can reverse predictor versus criterion with minimal change in syntax, but the choice to do so should be <em>theoretically</em> motivated. Likewise, in SEM, if one does now have clear predictions about the relationship between two variables, sometimes an undirected covariance between them is the appropriately weak parameterization.</p>
 <pre class="r"><code>syn2 &lt;- &#39;
 B ~ A
 C ~ B
@@ -875,6 +875,7 @@ summary(m2)</code></pre>
 ##   Estimator                                         ML
 ##   Model Fit Test Statistic                       0.000
 ##   Degrees of freedom                                 0
+##   Minimum Function Value               0.0000000000000
 ## 
 ## Parameter Estimates:
 ## 
@@ -939,14 +940,14 @@ psych::describe(abc)</code></pre>
 <td align="right">1000</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">-0.005</td>
-<td align="right">-0.001</td>
-<td align="right">1.020</td>
-<td align="right">-3.59</td>
-<td align="right">2.80</td>
-<td align="right">6.39</td>
-<td align="right">-0.007</td>
-<td align="right">-0.137</td>
+<td align="right">0.020</td>
+<td align="right">0.010</td>
+<td align="right">1.026</td>
+<td align="right">-3.49</td>
+<td align="right">2.99</td>
+<td align="right">6.48</td>
+<td align="right">-0.110</td>
+<td align="right">0.037</td>
 <td align="right">0.032</td>
 </tr>
 <tr class="even">
@@ -955,14 +956,14 @@ psych::describe(abc)</code></pre>
 <td align="right">1000</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">-0.001</td>
-<td align="right">-0.007</td>
-<td align="right">1.004</td>
-<td align="right">-3.33</td>
-<td align="right">3.54</td>
-<td align="right">6.86</td>
-<td align="right">0.065</td>
-<td align="right">0.085</td>
+<td align="right">-0.019</td>
+<td align="right">0.000</td>
+<td align="right">0.969</td>
+<td align="right">-2.88</td>
+<td align="right">3.12</td>
+<td align="right">6.00</td>
+<td align="right">0.032</td>
+<td align="right">0.023</td>
 <td align="right">0.032</td>
 </tr>
 <tr class="odd">
@@ -971,14 +972,14 @@ psych::describe(abc)</code></pre>
 <td align="right">1000</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">0.007</td>
-<td align="right">-0.003</td>
-<td align="right">0.993</td>
-<td align="right">-3.27</td>
-<td align="right">3.29</td>
-<td align="right">6.55</td>
-<td align="right">0.012</td>
-<td align="right">0.001</td>
+<td align="right">-0.025</td>
+<td align="right">-0.007</td>
+<td align="right">0.987</td>
+<td align="right">-3.02</td>
+<td align="right">2.92</td>
+<td align="right">5.94</td>
+<td align="right">0.065</td>
+<td align="right">-0.127</td>
 <td align="right">0.032</td>
 </tr>
 </tbody>
@@ -1161,7 +1162,7 @@ summary(m_ind)</code></pre>
 <td align="right">0</td>
 <td align="left"></td>
 <td align="left">.p3.</td>
-<td align="right">0.500</td>
+<td align="right">0.499</td>
 <td align="right">0.959</td>
 <td align="right">0.043</td>
 </tr>

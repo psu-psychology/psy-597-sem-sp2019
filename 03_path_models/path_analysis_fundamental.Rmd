@@ -527,6 +527,8 @@ model = "
 "
 
 pathMod = sem(model, data=abc)
+#summary(pathMod)
+#parTable(pathMod)
 coef(pathMod)
 semPlot::semPaths(pathMod, whatLabels = 'par', style = 'lisrel',  
                   sizeMan=10, 
