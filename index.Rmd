@@ -37,5 +37,8 @@ If you already cloned a local copy of the repo, you can get the latest updates u
       - [Matrix Algebra Review](02_sem_basics/matrix_algebra_review.html)
       - [SEM Notation](02_sem_basics/sem_notation.html)
       - [Onyx Tutorial](02_sem_basics/onyx_tutorial/Onyx.html)
-      
+3.  Path analysis
+      - [Lecture](03_path_models/path_analysis_fundamental.html)
+      - [Practical](03_path_models/path_analysis_demo.html)
+
 

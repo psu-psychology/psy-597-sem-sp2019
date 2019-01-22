@@ -1,0 +1,14 @@
+digraph iv {
+  graph [rankdir=LR bgcolor=transparent]
+  
+  node [shape = rectangle, style=filled, fillcolor='#1f65b780', color=gray80, 
+        fontcolor=white, fontname=Roboto, fixedsize=true, fontsize='10%']
+  
+  H [label='Hus.\n Satis']; 
+  W [label='Wife\n Satis'];
+  
+  edge [shape = circle, alpha=.5 color=gray50 style=filled penwidth=.75 arrowsize=.75 minlen=4]
+  H -> W;
+  W -> H;
+
+}

@@ -1,0 +1,363 @@
+---
+title: "leftovers"
+author: "Michael Hallquist"
+date: "9/7/2017"
+output: html_document
+---
+
+Insight about zetas versus psi matrix
+
+Zetas are individual-specific residuals in the latent factors (deviation from grand mean).
+
+Variances of these are the diagonal of Psi (i.e., sample variation in the deviations).
+
+Leftovers from path_analysis_fundamentals.
+
+
+##Examples
+
+
+```{r}
+grViz("digraph regression {
+graph [rankdir = LR bgcolor=transparent]
+
+forcelabels=true;
+
+node [shape = box, fontcolor=gray25 color=gray80]
+
+node [fontname='Helvetica']
+X1 [label='X\n(Exogenous)'];
+
+node [fillcolor=gray90 style=filled]
+Y [label='Y\n(Endogenous)'];
+
+edge [color=gray50 style=filled]
+X1 -> Y [label='Direct']
+}")
+```
+
+#A few assumptions of SEM
+
+- The causes of exogenous variables are not part of the model (i.e., we do not try to explain them).
+- All endogenous variables have an error term (i.e., 'disturbance') that reflects unmeasured latent causes and measurement error.
+- Total effects of one variable on another can be decomposed into total and indirect effects (i.e., effects mediated by intervening variables).
+- Exogenous variables are measured without error (as in regression).
+
+## Multivariate normality
+
+Basic maximum likelihood estimation assumes that the *endogenous* variables are distributed according to a multivariate normal distribution. 'MVN' data have three properties:
+
+1. All individual distributions are normal (i.e., univariate).
+2. All bivariate distributions are normal.
+3. The bivariate associations are linear and the distribution of bivariate residuals is homoscedastic.
+
+
+## Recursive models
+
+## Order condition
+
+
+#TODO:
+
+Discussion of normality?
+Data screening? Mahalanobis distance
+Multicollinearity, checking the eigendecomposition of the matrix (or at least the eigenvalues)
+Ill-scaled covariance matrix: ratio of largest to smallest variance is greater than 20.
+Convergence criterion: changes in the fit criterion (e.g., OLS or likelihood function) become minimal as the algorithm reaches good estimates, thus relative change becomes small.
+
+
+Score reliability (punt to psychometrics week)
+  - Alpha, split-half
+  - Using these as error variances in SEM
+  
+
+The correlation between variables X and Y in a path model is equal to the sum of the product of all standardized paths between 
+
+## Correlated causes
+
+There can 
+
+
+#####
+
+From psychometrics lecture (didn't get to it)
+
+## Multiple 
+
+
+# Risks of ad hoc scales
+
+## Modifying existing scales
+
+# Brief and single-item scales
+
+
+---
+
+From EFA lecture (didn't finish)
+
+
+
+Variance of indicator can be decomposed into part attributable factor (common variance) versus unique/residual variance:
+
+$$
+\textrm{var}(y_1) = \lambda_{11}^2 \psi_{11} + \varepsilon_1
+$$
+
+
+We can also relax the assumption of uncorrelated factors.
+
+
+
+$$
+Var(y_1) = \lambda_{11}^2 \psi_{11} + \varepsilon_1
+$$
+
+
+#Identification of common factor model
+
+## First loading versus factor variance
+
+
+# from invariance day
+
+# Measurement invariance
+
+The overarching goal of measurement invariance (MI) testing is to examine whether a test measures the same construct in different groups. Likewise, one can ask whether a test measures the same construct in the *same* group over time (this is longitudinal MI). Like congeneric, tau-equivalent, and parallel models, there are some canonical applications of MI that help with the interpretation latent constructs across groups.
+
+## Configural invariance
+
+As in the single-group case, the configural model refers to the configuration of relationships between latent and observed variables. The idea of configural invariance is that the same model applies in all groups, but the parameters are free in each.
+
+## Weak/metric invariance
+
+Enforce equality on factor loadings across groups.
+
+## Strong
+
+## Strict
+
+## Scalar
+
+## Metric
+
+## Structural
+
+## How to identify noninvariance?
+
+## Partial invariance
+
+### dMACS
+
+Nye and Drasgow propose an effect size measure to quantify the magnitude of noninvariance.
+
+At the moment, the first author provides software to compute this, but it is not easy to do by hand: https://psychology.psy.msu.edu/pers_nye/dMACS_files%20(for%20Distribution)/
+
+### Change in CFI
+
+Meade and colleagues (2008, *J Applied Psych*) found that 
+
+### model chi-sq diff test
+
+#
+
+http://www.lesahoffman.com/CLP948/CLP948_Example07a_CFA_MG_Invariance.pdf
+
+
+```{r, eval=FALSE}
+#too clunky in graphViz
+grViz("digraph regression {
+graph [rankdir = LR bgcolor=transparent, layout=dot]
+
+forcelabels=true;
+
+node [shape = box, fontcolor=gray25 color=gray80]
+
+node [fontname='Helvetica']
+X; M1; M2; Y
+
+{rank=same M1 M2}
+
+X -> M1 -> Y 
+X -> M2 -> Y
+M1:s -> M2:n [direction='both']
+
+}")
+```
+
+
+##still trying to figure out the effect coding on moderation here
+Likewise, the strength of association in each group is:
+
+```{r}
+x1 <- rnorm(100)
+x2 <- factor(rep(0:1, 50))
+y <- rnorm(100)
+int <- x1*x2
+df <- data.frame(y=y, x1=x1, x2=x2, int=int)
+m <- lm(y ~ x1*x2, df)
+```
+
+$$
+b_{g=0} = b1
+b_{g=0} = b1
+$$
+
+Currently not getting group.partial to work for factor means
+
+We could test a model in which only the textual factor differs between schools, whereas the other means are equal:
+
+```{r}
+mmeandiff_textual <- cfa(HS.model, data = HolzingerSwineford1939, std.lv=FALSE, group = "school", meanstructure=TRUE, group.equal=c("loadings", "intercepts", "residuals", "lv.variances", "lv.covariances", "means"), group.partial=c("x3~1", "x7~1", "textual~1"))
+
+summary(mmeandiff_textual, standardized=TRUE)
+anova(mstructural, mmeandiff)
+
+```
+
+### leftovers from latent curve models. This is Michael Clark's code.
+
+# Thinking more generally about regression
+
+In fact, your standard regression is already equipped to handle heterogeneous variances and a specific correlation structure for the residuals. The linear model can be depicted as the following:
+
+$$y \sim N(X\beta, \Sigma)$$
+
+$X\beta$ represents the linear predictor, i.e. the linear combination of your predictors, and a big, N by N covariance matrix $\Sigma$.  Thus the target variable $y$ is multivariate normal with mean vector $X\beta$ and covariance $\Sigma$.
+
+SLiMs assume that the covariance matrix is constant diagonal.  A single value on the diagonal, $\sigma^2$, and zeros on the off-diagonals.  Mixed models, and other approaches as well, can allow the covariance structure to be specified in myriad ways, and it ties them to still other models, which in the end produces a very flexible modeling framework.
+
+
+
+# More on LCM
+
+## LCMs are non-standard SEM
+
+In no other SEM situation are you likely to fix so many parameters or think about your latent variables in this manner.  This can make for difficult interpretations relative to the mixed model (unless you are aware of the parallels).
+
+## Residual correlations
+
+Typical models that would be investigated with LCM have correlated residuals as depicted above.
+
+## Nonlinear time effect
+
+A nonlinear time effect can be estimated if we don't fix all the parameters for the slope factor. As an example, the following would actually estimate the loadings for times in between the first and last point.
+
+```{r nonlinearTime, eval=FALSE}
+    s =~ 0*y0 + y1 + y2 + 1*y3
+```
+
+It may be difficult to assess nonlinear relationships unless one has many time points[^nonlinearfewtimepts], and even then, one might get more with an additive mixed model approach.
+
+
+## Other covariates
+
+### Cluster level
+
+To add a <span class="emph">cluster-level covariate</span>, for a mixed model, it looks something like this:
+
+*standard random intercept*
+
+$$y = b_{0c} + b1*\mathrm{time} + e $$
+$$b_{0c} = b_0 + u_c$$   
+
+Plugging in becomes:
+$$y = b_0 + b1*\mathrm{time} + u_c + e $$
+
+*subject level covariate added*
+
+$$b_{0c} = b_0 + c1*\mathrm{sex} + u_c$$ 
+
+But if we plug that into our level 1 model, it just becomes:
+$$y = b_0 + c1*\mathrm{sex} + b1*\mathrm{time} + u_c + e$$
+
+In our previous modeling syntax it would look like this:
+
+```{r clusterLevelVar, eval=F}
+mixedModel = lmer(y1 ~ sex + time + (time|subject), data=d)
+```
+
+We'd have a fixed effect for sex and interpret it just like in the standard setting. Similarly, if we had a time-varying covariate, say socioeconomic status, it'd look like the following:
+```{r timevaryingVar, eval=F}
+mixedModel = lmer(y1 ~ time + ses + (time|subject), data=d)
+```
+
+Though we could have a random slope for SES if we wanted.  You get the picture. Most of the model is still standard regression interpretation.
+
+With LCM, there is a tendency to interpret the model as an SEM, and certainly one can.  But adding additional covariates typically causes confusion for those not familiar with mixed models.  We literally do have to regress the intercept and slope latent variables on cluster level covariates as follows.
+
+```{r LCMClutersLevelVar}
+model.syntax <- '
+  # intercept and slope with fixed coefficients
+    i =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
+    s =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
+
+  # regressions
+    i ~ x1 + x2
+    s ~ x1 + x2
+'
+```
+
+Applied researchers commonly have difficulty on interpreting the model due to past experience with SEM.  While these are latent variables, they aren't *just* latent variables or underlying constructs.  It doesn't help that the output can be confusing, because now one has an 'intercept for your intercepts' and an 'intercept for your slopes'. In the multilevel context it makes sense, but there you know 'intercept' is just 'fixed effect'.
+
+
+
+### Time-varying covariates
+
+With <span class="emph">time-varying covariates</span>, i.e. those that can have a different value at each time point, the syntax starts to get tedious.  Here we add just one such covariate, $c$.
+
+```{r LCMTimeVar, eval=F}
+model.syntax <- '
+  # intercept and slope with fixed coefficients
+    i =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
+    s =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
+
+  # regressions
+    i ~ x1 + x2
+    s ~ x1 + x2
+
+  # time-varying covariates
+    y1 ~ c1
+    y2 ~ c2
+    y3 ~ c3
+    y4 ~ c4
+'
+fit <- growth(model.syntax, data=Demo.growth)
+summary(fit)
+```
+
+Now imagine having just a few of those kinds of variables as would be common in most longitudinal settings. In the mixed model framework one would add them in as any covariate in a regression model, and each covariate would be associated with a single fixed effect. In the LCM framework, one has to regress each time point for the target variable on its corresponding predictor time point.  If you fix the coefficients of each regression to a single value, you would duplicate the mixed model. That is, SEM allows for the possibility that a time-specific covariate has time-specific effects.
+
+# Some Differences between Mixed Models and Growth Curves
+
+
+## Random slopes
+
+One difference seen in comparing LCM models vs. mixed models is that in the former, random slopes are always assumed, whereas in the latter, one would typically see if it's worth adding random slopes in the first place, or simply not assume them.  There is currently a fad of 'maximal' mixed models in some disciplines, that would require testing every possible random effect.  All I can say is good luck with that.
+
+## Wide vs. long
+
+The SEM framework is inherently multivariate, and your data will need to be in wide format.  This isn't too big of a deal until you have many time-varying covariates, then the model syntax is tedious and you end up having the number of parameters to estimate climb rapidly.
+
+## Sample size
+
+As we have noted before, SEM is inherently a large sample technique.  The growth curve model does not require as much for standard approaches, but may require a lot more depending on the model one tries to estimate.  In [my own simulations](https://m-clark.github.io/docs/mixedModels/growth_vs_mixed_sim.html), I haven't seen too much difference compared to mixed models even for notably small sample sizes, but those were for very simple models.
+
+## Number of time points
+
+A basic growth curve model requires four time points to incorporate the flexibility that would make it worthwhile.  Mixed models don't have the restriction (outside of the obvious need of two).
+
+## Balance
+
+Mixed models can run even if some clusters have a single value. SEM requires balanced data and so one will always have to estimate missing values or drop them.  Whether this missingness can be ignored in the standard mixed model framework is a matter of some debate in certain circles.
+
+## Numbering the time points
+
+Numbering your time from zero makes sense in both worlds.  This leads to the natural interpretation that the intercept is the mean for your first time point.  In other cases having a centered value would make sense, or numbering from 0 to a final value of 1, which would mean the slope coefficient represents the change over the whole time span.
+
+
+# Other stuff
+
+In the [appendix][Parallel Process Example] I provide an example of a parallel process in which we posit two growth curves at the same time, with possible correlations among them. This could be accomplished quite easily with a standard mixed model in the Bayesian framework, with a multivariate response, though I'll have to come back to that later.  
+
+Here is a more detailed comparison of multilevel and growth curve models: http://m-clark.github.io/mixed-growth-comparison/. However, the latent variable approach may provide what you need, and at the very least gives you a fresh take on the standard mixed model perspective.
