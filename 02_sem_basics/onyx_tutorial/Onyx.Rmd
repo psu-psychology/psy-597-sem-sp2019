@@ -1,8 +1,17 @@
 ---
-title: "Onyx example code"
+title: "Ωnyx Tutorial - Expanded Edition"
 author: "Nate Hall (adapted with permission from Benjamin N. Johnson)"
 date: "Jan 15, 2019"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    code_folding: hide
+    df_print: kable
+    mathjax: default
+    theme: spacelab
+  
 ---
 
 ```{r setup, include=FALSE}
@@ -10,8 +19,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ##change below to the current working directory on your machine
 
-# basedir <- file.path("~/Box Sync/SPR19_SEM/onyx_tutorial/") #iMac
-basedir <- file.path("~/Box/psy-597-sem-sp2019/02_sem_basics/onyx_tutorial/") #mbp
+basedir <- file.path("~/Box Sync/psy-597-sem-sp2019/02_sem_basics/onyx_tutorial/") #iMac
+# basedir <- file.path("~/Box/psy-597-sem-sp2019/02_sem_basics/onyx_tutorial/") #mbp
 setwd(basedir)
 
 library(dplyr)
@@ -22,10 +31,60 @@ library(jtools)
 #pacman::p_load(dplyr, lavaan, jtools)
 ```
 
+This tutorial is meant to walkthrough how Ωnyx allows users to walk through conceptual path models (visual) and convert them on the fly into `lavaan` code for analysis.
 
-#Simple intro: Single Predictor regression using the `lm()` function on sample data from Onyx:
+#Download Instructions:
 
-Start with loading data from the example: \n
+* Ωnyx is freely available for download [here.](http://onyx.brandmaier.de/)
+
+* You will need [Java Runtime Environment](https://java.com/en/download/manual.jsp) installed in order to run Ωnyx. 
+
+* Ωnyx is not installed but is simply opened using Java, so just double click on the .jar file to open the program.
+
+#The Basics: 
+
+* Ωnyx is almost entirely graphically based and relies on point-and-click methods.  Start by opening some data.  Open the Ωnyx menu at the top left and navigate to the Simple Regression Data to begin:
+
+![](images/load_data.png)
+
+* You’ll see a hexagon appear.  This represents a dataset and includes 3 vectors: ID, X_c, and Y_c, the latter of which are two centered continuous variables:  
+
+![](images/sample_data.png)
+
+* Double-click in the blank space or right(ctrl) click and select “Create Empty Model” to create a space for your path diagram:
+
+![](images/create_new_model.png)
+
+* By right(ctrl) clicking in the model space, you will open a window from which you can build your model.  Try creating two observed variables for your X and Y vectors from the dataset you opened earlier:
+
+![](images/create_var.png)
+
+* Connect these variables with a regression line by right(ctrl) clicking and dragging the arrow that appears from one box to the other:
+
+![](images/reg_path_1.png)
+
+* You’ve now created the visual representation of your first regression model!  Now, add the data to the appropriate boxes by dragging the variables from the data hexagon to the boxes.  You’ll notice that the variable names change in the boxes and actual variance estimates are now generated, based on the raw data:
+
+![](images/reg_1_wdata.png)
+
+* Finally, allow the regression path to be freely estimated by right(ctrl) clicking on the regression line and selecting “Free Parameter”:
+
+![](images/free_param.png)
+
+* You’ll notice there is now an unstandardized b weight being estimated for the regression of Y_c onto X_c.  You can also add the standardized weights by selecting “Show Standardized Estimates” under the “Customize Path” dialog:
+
+![](images/show_standard_estims.png)
+
+* We can also clean up the variable names in the boxes or for the paths/variances if we want, change the colors, etc. all in the right(ctrl) click dialog box.
+
+![](images/make_pretty.png)
+
+* One final helpful trick is to pull the underlying code (e.g., lavaan code) and/or the covariance matrix from the model you just developed.  Notice Ωnyx generates lavaan code that is used with the lavaan() function (rather than the cfa() function), which requires specifying of all relevant parameters (e.g., variances) and is more useful for learning what’s going on with your code:
+
+![](images/show_lavaan.png)
+![](images/lav_code.png)
+
+*we can run the exact same analysis using the simple linear model syntax from the `lm()` function. Start with loading data from the example: 
 
 ```{r onyx single predictor}
 simple.dat <- read.csv("simple_regression_data.csv", header = TRUE, sep = "\t")
@@ -35,7 +94,7 @@ summ(simple.lm)
 summary(simple.lm)
 ```
 \n
-Now, let's load the model we generated in Onyx:
+Now, let's load the model we generated in Ωnyx (named differently from an earlier iteration, but the idea is the same):
 
 ```{r lavaan single predictor}
 source("single_predictor_data.R")
@@ -55,6 +114,10 @@ source("single_predictor_data.R")
 ```
 
 #Now, let's expand to multiple regression:
+
+In Ωnyx:
+
+![](images/mult_reg.png)
 
 ```{r example}
 data(mtcars)
@@ -98,7 +161,7 @@ inspect(result, "list")
 
 ```
 
-#running the same model with much less input 
+* Running the same model with much less input gives us the same result:
 
 ```{r onyx_cf}
 model2<-'
@@ -109,7 +172,9 @@ summary(result2,fit.measures=T)
 inspect(result2,"list")
 ```
 
-#Fitting a simple single-factor CFA:
+#One step more complicated, a simple single-factor CFA:
+
+![](images/cfa.png)
 
 ```{r onyx_cfa}
 

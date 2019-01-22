@@ -1,0 +1,152 @@
+---
+title: "SEM 1: R Basics KEY"
+author: "Benjamin N. Johnson"
+date: "August 24, 2017"
+output:
+  html_document:
+    code_folding: show
+    df_print: kable
+    mathjax: default
+    number_sections: no
+    theme: spacelab
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+cov2cor() converts covariance matrices to correlations by dividing by pooled standard error (sxsy)
+lavaan::cor2cov() does the opposite (multiplying)
+
+
+```{r include=FALSE}
+library(tidyverse)
+library(lm.beta)
+
+```
+
+#Part A
+
+##1.
+
+
+
+```{r}
+#read in data 
+cars<-read.csv("cars.csv",head=T)
+#OR
+data(cars) #reads in from built-in R dataset
+
+#confirm we did it right
+head(cars)
+```
+
+
+##2.  
+
+```{r}
+#linear model
+m<-lm(dist~speed,cars)
+summary(m)
+```
+
+There is a significant effect of speed on stopping distance.
+
+##3. 
+###a)
+Can convert unstandardized b to standardized b using the lm.beta package
+
+```{r}
+
+lm.beta(m)
+
+
+```
+
+###b)
+
+The standardized beta for a single-predictor lm is equivalent to the correlation. So r = `r lm.beta(m)$standardized.coefficients[[2]]%>%round(2)` 
+
+```{r}
+#checking
+cor(cars)
+```
+
+###c)
+```{r}
+
+#calculating the covariance from the correlation
+##pulling out the correlation from the lm, passed through lm.beta 
+cor=lm.beta(m)$standardized.coefficients[[2]]
+cor
+
+##getting the product of X & Y SDs
+sd2=sd(cars[,"speed"])*sd(cars[,"dist"])
+sd2
+
+##calculating the covariance
+cov=cor*sd2
+cov
+
+#checking
+cov(cars)
+
+```
+##4.
+
+```{r}
+plot(cars)
+```
+
+
+#Part B
+
+##1.
+
+```{r}
+data(mtcars)
+names(mtcars)
+```
+
+##2.
+
+```{r}
+
+filter(mtcars, cyl>4) %>% lm(mpg~hp+wt+gear, data=.) %>% summary()
+
+```
+
+##3.
+
+```{r}
+# str(mtcars)
+lm(mpg~hp*cyl+wt+gear, data=mtcars) %>% summary()
+
+```
+
+#Part C
+
+##1.
+
+```{r}
+data(ability.cov)
+
+#checking to see what's in this list
+str(ability.cov)
+```
+
+##2.
+
+```{r}
+
+ability.cor<-cov2cor(ability.cov$cov)
+ability.cor
+```
+
+
+##3.
+
+
+`reading` and `vocab` appear the highest correlated, potentially suggesting an underlying "language ability" construct. 
