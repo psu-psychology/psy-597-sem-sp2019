@@ -40,5 +40,9 @@ If you already cloned a local copy of the repo, you can get the latest updates u
 3.  Path analysis
       - [Lecture](03_path_models/path_analysis_fundamental.html)
       - [Practical](03_path_models/path_analysis_demo.html)
+4.  Latent Variables
+    -  [Lecture](04_latent_variables_estimation/latent_variables.html)
+    -  [Maximum Likelihood](04_latent_variables_estimation/maximum_likelihood.html)
+
 
 
