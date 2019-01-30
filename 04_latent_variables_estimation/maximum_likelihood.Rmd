@@ -28,7 +28,8 @@ pre { font-size: 16px; }
 
 ```{r setup, include=FALSE}
 if (!require(pacman)) { install.packages("pacman"); library(pacman) }
-p_load(knitr, MASS, tidyverse, viridis, lavaan, modelr, mlbench, lattice, lm.beta, semPlot, DiagrammeR, matrixcalc)
+p_load(knitr, MASS, tidyverse, viridis, lavaan, modelr, mlbench, lattice, lm.beta, 
+       semPlot, DiagrammeR, matrixcalc, KernSmooth)
 knitr::opts_chunk$set(echo = TRUE) #print code by default
 options(digits=3) 
 ```
@@ -43,7 +44,7 @@ In most of SEM, and regression for that matter, scientists often select the Gaus
 Let's focus on the univariate Gaussian distribution as a test case for thinking about parameter fitting and likelihood methods. A Gaussian distribution has a mean and standard deviation that define the location and scale, respectively, of the data it describes. This is typically denoted:
 
 $$ X \sim \mathcal{N}(\mu, \sigma^2) $$
-where *X* is a random variable distributed as normal with mean $\mu$ and variance $\sigma^2$. For example, here is the density of normally distributed numbers with $\mu = 10$ and $\sigma^2 = 50$.
+where *X* is a random variable distributed as normal with mean $\mu$ and variance $\sigma^2$. The parameters that control the shape of the distribution are sometimes called *sufficient statistics* (after Fisher) because if we know the values for these parameters, we can fully describe the distribution. That is, if the data are truly normal, then knowing the mean and variance alone is sufficient to have a detailed sense of how the scores will be distributed in a sample. For example, here is the density of normally distributed numbers with $\mu = 10$ and $\sigma^2 = 50$.
 
 ```{r}
 x <- seq(-15, 35, length=50)
@@ -52,18 +53,20 @@ df <- data.frame(x=x, hx=hx)
 ggplot(df, aes(x=x, y=hx)) + geom_bar(stat="identity") + xlab("X value") + ylab("Density")
 ```
 
-Importantly, when we are trying to identify the underlying parameters of a distribution such as the normal, we might try a fitting procedure (similar to OLS in regression). That is, we could try to minimize the discrepancy between the observed scores $X$ and the predicted data from a Gaussian distribution with mean $\mu$ and variance $\sigma^2$. By trying different values for the mean and variance, we could identify the values that best characterize the data. This is conceptually identical to trying to identify a best-fitting univariate regression line where we might test many values of the slope $\beta$.
+Importantly, when we are trying to identify the underlying parameters of a distribution such as the normal, we might try a fitting procedure (similar to OLS in regression). That is, we could try to minimize the discrepancy between the observed scores $X$ and the predicted data from a Gaussian distribution with mean $\mu$ and variance $\sigma^2$. By trying different values for the mean and variance, we could identify the values that best characterize the data. This is conceptually identical to trying to identify a best-fitting univariate regression line where we might test many values of the slope $\beta$. We could also posit that the data are drawn from some other population distribution, such as a Beta distribution, which would mean that we would need to adjust both the *model* and the parameter estimates.
 
-# Fitting a univariate normal distribution using maximum likelihood
+# Fitting a univariate distribution using maximum likelihood
 
-Distribution fitting can be accomplished using a form of maximum likelihood estimation. Glossing over the details for now, imagine that we simulated 5000 observations from a normal distribution with $\mu = 50$ and $\sigma^2 = 50$. If we handed this dataset to a friend without any further information, could they figure out: a) the statistical distribution of the data, and b) the best-fitting parameters of that distribution?
-
-Here are the data:
+Distribution fitting can be accomplished using a form of maximum likelihood estimation. Glossing over the details for now, imagine that we had a dataset of 5000 observations that have the following density:
 
 ```{r}
 X <- rnorm(5000, mean=50, sd=sqrt(50))
 lattice::histogram(X)
 ```
+
+## Statement of the problem
+
+Given these observations, when we think about distribution fitting, we can ask the following questions. If we handed this dataset to a friend without any further information, could they figure out: a) the statistical distribution of the data, and b) the best-fitting parameters of that distribution? Stated differently, what is the likelihood that these observations are drawn from a candidate population distribution with its corresponding parameters. For example, what is the likelihood that these observations were sampled from a Normal distribution with $\mu = 3$ and $\sigma^2 = 5$?
 
 ## Sample likelihood function
 
@@ -89,14 +92,16 @@ Returning to our simulated data, we could try to compute the parameters of diffe
 
 ## Mis-fitting the data with the wrong distribution
 
-Let's start with the gamma distribution, which we know (because of our omniscient status on this problem) is wrong. The parameters of a gamma distribution are the *shape*, $\alpha$, and *rate*, $\beta$. For example, here is a gamma distribution with $\alpha=2$ and $\beta=2$:
+**Spoiler alert**: for this dataset, we simulated 5000 observations from a normal distribution with $\mu = 50$ and $\sigma^2 = 50$. Thus, the *groundtruth* model is a normal distribution with these parameters. In empirical data, however, we essentially never have such details and instead have to infer the statistical distribution based on the data themselves.
+
+Let's start with the gamma distribution as one candidate that could describe these data. We know (because of our omniscient status on this problem) that this distribution is wrong in the sense that the data were not generated from gamma. Nevertheless, it could be plausible and fit well. The parameters of a gamma distribution are the *shape*, $\alpha$, and *rate*, $\beta$. For example, here is the shape of a gamma distribution with $\alpha=2$ and $\beta=2$:
 
 ```{r}
 gam_sim <- rgamma(5000, shape = 2, rate = 2)
 lattice::histogram(gam_sim)
 ```
 
-And here is the estimate of the parameters of a gamma distribution that best fit the 5000 observed scores generated above from a normal distribution with $\mu = 50$ and $\sigma^2 = 50$.
+Let's take our dataset and ask the question, "What would be the parameters of a gamma distribution that would maximize the likelihood of these data?" Said differently, if we try to approximate the data with a gamma distribution, what parameters would yield the closest fit to the sample: Here is the estimate of the parameters of a gamma distribution that best fit the 5000 observed scores.
 
 ```{r}
 gfit <- suppressWarnings(fitdistr(X, "gamma"))
@@ -116,7 +121,9 @@ Critically, the log-likelihood of the data given the parameters of this gamma di
 gfit$loglik
 ```
 
-*N.B.* Higher likelihood estimates are always better! Thus, even though this is negative, the larger it is, the more likely the data are given the parameters and model. The log-likelihood estimate provides an essential measure of *relative fit* between the data and the model (with its parameters).
+*N.B.* Higher likelihood estimates are always better! Thus, even though this is negative, the larger it is, the more likely the data are given the parameters and model. The log-likelihood estimate provides an essential measure of *relative fit* between the data and the model (with its parameters). In essence, the $LL$ here provides a single number that describes how likely the data are to have been generated by a gamma distribution at the fitted parameters:
+
+$X \sim \Gamma(\alpha=`r gfit$estimate["shape"]`, \beta=`r gfit$estimate["rate"]`)$
 
 ## Fitting the data using the correct underlying distribution (i.e., normal)
 
@@ -124,7 +131,7 @@ Let's compare this to fitting the data using a normal distribution. Recall that 
 
 This relates to the $\textrm{model}$ piece of the sample likelihood. Above, with the gamma distribution, we estimated parameters under a gamma model that best fit the scores. Here, the $\textrm{model}$ is the normal distribution.
 
-Using the maximum likelihood fitting procedure of `fitdistr`, the best-fitting parameters are essentially identical to the groundtruth, $\mu = 10$, $\sigma^2 = 50$, $\sigma = 7.07$ (i.e., sd is the sqrt of variance).
+Using the maximum likelihood fitting procedure of `fitdistr`, the best-fitting parameters are essentially identical to the groundtruth, $\mu = 50$, $\sigma^2 = 50$, $\sigma = 7.07$ (i.e., sd is the sqrt of variance).
 
 ```{r}
 nfit <- fitdistr(X, "normal")
@@ -137,14 +144,15 @@ There will be sampling variability in the values of $X$ drawn from a Gaussian di
 c(mean=mean(X), sd=sd(X))
 ```
 
-
 Let's compare the fit of the normal distribution to the data relative to the gamma distribution. Both log-likelihoods are estimated at the best-fitting parameters (i.e., the best fit the algorithm could achieve)
 
 ```{r}
 c(normal=nfit$loglik, gamma=gfit$loglik)
 ```
 
-Notice that the log-likelihood (often abbreviated LL) is higher than the gamma distribution (by about 30-40 points). This indicates that the normal distribution at optimized parameters fits the data better than the gamma distribution. This makes sense given that we simulated data from the normal! But it is also an important theoretical point that one *model* may represent the data better than another, even after fitting the parameters of each model. Simply put, the normal distribution is a better *representation* of $X$ than the gamma distribution. 
+Notice that the log-likelihood (often abbreviated LL) is higher for the normal distribution than the gamma distribution (by about 30-40 points). This indicates that the normal distribution at optimized parameters fits the data better than the gamma distribution. This makes sense given that we simulated data from the normal! But it is also an important theoretical point that one *model* may represent the data better than another, even after fitting the parameters of each model. Simply put, the normal distribution is a better *representation* of $X$ than the gamma distribution.
+
+And in this case, we would interpret the results in terms of which distribution -- with its corresponding fitted parameters -- best describes the density of the 5000 scores on $X$. In other words, the data are more likely to have come from a normal distribution with mean = `r nfit$estimate["mean"]` and sd = `r nfit$estimate["sd"]` than a gamma distribution with shape = `r gfit$estimate["shape"]` and rate = `r gfit$estimate["rate"]`.
 
 ## Sample likelihood of a univariate normal distribution
 
@@ -169,7 +177,7 @@ Knowing this formula, we can test candidate values for $\mu$ and $\sigma^2$ to d
 
 Let's start with a candidate distribution with $\mu = 2$ and $\sigma^2 = 5$. Note that this is likely to be a bad fit given our *population* (aka 'groundtruth') parameters used in the simulation above. The population has $\mu = 50$ and $\sigma^2 = 50$.
 
-Here are the probabilities (computed using the pdf equation above) for the first five observations:
+Here are the probabilities (computed using the pdf equation above) for the first five observations, `r round(X[1:5], 1)`:
 
 ```{r}
 pdf_norm <- function(x, mu, sigma2, log=FALSE) {
@@ -180,17 +188,17 @@ pdf_norm <- function(x, mu, sigma2, log=FALSE) {
 
 iprobs <- pdf_norm(X, mu=2, sigma2=5)
 #iprobs <- pdf_norm(X, mu=50, sigma2=sqrt(50))
-iprobs[1:5]
+print(cbind(X=X[1:5], prob=iprobs[1:5]))
 ```
 
-Thus, each of these probabilities represents the *likelihood* that a given value from $X$ was drawn from the candidate normal distribution with $\mu = 2$ and $\sigma^2 = 5$. Notice how tiny these individual likelihoods are, suggesting we are very far from approximating the data. In addition, the tiny values undermine our numerical precision in computing the overall likelihood, which is a product of the individual likelihood. This is one motivation for working with log likelihoods, which are numerically more stable. Here are the *log* probabilities for the first five scores `r round(X[1:5], 1)`:
+Thus, each of these probabilities represents the *likelihood* that a given value from $X$ was drawn from the candidate normal distribution with $\mu = 2$ and $\sigma^2 = 5$. Notice how tiny these individual likelihoods are, suggesting we are very far from approximating the data. In addition, the tiny values undermine our numerical precision in computing the overall likelihood, which is a product of the individual likelihood. This is one motivation for working with log likelihoods, which are numerically more stable. Here are the *log* probabilities for the first five scores `r round(X[1:5], 1)` under the same test of a normal distribution with $\mu = 2$ and $\sigma^2 = 5$:
 
 ```{r}
 iprobs_log <- log(iprobs)
-iprobs_log[1:5]
+print(cbind(X=X[1:5], prob=iprobs[1:5], log_prob=iprobs_log[1:5]))
 ```
 
-Note that each of these values gives us information about likely a single data point, $x$, is to have come from the candidate normal distribution ( $\mu = 2, \sigma^2 = 5$). Thus, higher values are more probable than lower values.
+Each of these values gives us information about likely a single data point, $x$, is to have come from the candidate normal distribution ($\mu = 2, \sigma^2 = 5$). Thus, higher values are more probable than lower values.
 
 The formal sample likelhood function is the product of all individual likelihoods:
 
@@ -280,7 +288,7 @@ $$
 \frac{1}{(2 \pi)^{p/2} | \boldsymbol{\Sigma} |^{1/2}} e^{-(\mathbf{x}_i-\boldsymbol{\mu})'\boldsymbol{\Sigma}^{-1}(\mathbf{x}_i-\boldsymbol{\mu})/2}
 $$
 
-Note that $ | \boldsymbol{\Sigma} |^{1/2} $ denotes the square root of the *determinant* of the covariance matrix (details in previous matrix algebra lecture). Also, $p$ is the number of endogenous variables. We can re-express this as a log-likelihood of a vector of observations for a given *individual* $i$:
+Note that $| \boldsymbol{\Sigma} |^{1/2}$ denotes the square root of the *determinant* of the covariance matrix (details in previous matrix algebra lecture). Also, $p$ is the number of endogenous variables. We can re-express this as a log-likelihood of a vector of observations for a given *individual* $i$:
 
 $$
 \textrm{log}(\mathcal{L}(\mathbf{x}_i|\boldsymbol{\mu}, \boldsymbol{\Sigma}, model)) = 
@@ -300,7 +308,8 @@ As Enders (2010) describes, the multivariate Mahalanobis distance quantifies how
 
 ## The bivariate normal case
 
-In bivariate normal data (a simple case of MVN), we consider the joint Gaussian distribution of two variables, $x_1$ and $x_2$. The MVN distribution is described by:
+As noted above, bivariate normality of all pairs of (endogenous) variables is part of the MVN assumption in 'vanilla' SEM. In bivariate normal data (a simple case of MVN), we consider the joint Gaussian distribution of two variables, $x_1$ and $x_2$. The MVN distribution for the bivariate case is described by:
+
 $$
 \boldsymbol{\mu} = \begin{bmatrix}
 \mu_1 \\ \mu_2
@@ -311,7 +320,7 @@ $$
 \end{bmatrix}
 $$
 
-In the bivariate case ($p=2$) we can expand the individual likelihood for clarity in how the matrices are implicated:
+In the bivariate case ($p=2$), we can expand the individual likelihood for clarity in how the matrices are implicated:
 
 $$
 \mathcal{L}(\mathbf{x}_i|\boldsymbol{\mu}, \boldsymbol{\Sigma}, model) = 
@@ -329,7 +338,7 @@ where $\textrm{exp}$ is a shorthand for the exponentiation $e^{x}$.
 
 ## Visualization of bivariate normality
 
-And we can visualize the properties of bivariate normal data, by simulating data according to the following parameters:
+And we can visualize the properties of bivariate normal data to get an intuition for this assumption. Here, I'll simulate data for two variables, $X_1$ and $X_2$, with means of zero and variances of one (i.e., these are in z-score units). We will also start by simulating a correlation between $X_1$ and $X_2$ of $r = 0.5$.
 
 $$
 \boldsymbol{\mu} = \begin{bmatrix}
@@ -341,7 +350,8 @@ $$
 \end{bmatrix}
 $$
 
-In plain English, these parameters define two variables with means of zero, variance of 1, and covariance of 0.5. By virtue of having variance = 1, the covariance matrix $\boldsymbol{\Sigma}$ is also the correlation matrix (i.e., the variables correlate at $r = 0.5$).
+In plain English, these parameters define two variables with means of zero in the vector $\boldsymbol{\mu}$, variances of 1 (diagonal of $\Sigma$), and covariance of 0.5 (i.e., the off-diagonal, $\Sigma_{2,1}$. By virtue of having variances = 1, the covariance matrix $\boldsymbol{\Sigma}$ is also the correlation matrix (i.e., the variables correlate at $r = 0.5$).
+
 ```{r}
 mu <- c(0,0)                         # Mean
 Sigma <- matrix(c(1, .5, .5, 1), 2)  # Covariance matrix
@@ -354,7 +364,28 @@ ggplot(X, aes(x=X1, y=X2)) + stat_density_2d(geom = "raster", aes(fill = ..densi
 
 ```
 
-The brightness of the tiles denotes the *density* (i.e., the relative number of observations) in that part of the bivariate space. Note that the data are elliptical, not circular, with a positive slope. This is evidence that there is a positive covariance between the two variables. This is governed by $\Sigma_{12}$, the covariance of $x_1$ and $x_2$. If we set this parameter to zero, we would see a circular bivariate distribution:
+The brightness of the tiles denotes the *density* (i.e., the relative number of observations) in that part of the bivariate space. Note that the data are elliptical, not circular, with a positive slope. This is evidence that there is a positive covariance between the two variables, $X_1$ and $X_2$. This is governed by $\Sigma_{1,2}$, which we've set to $r = 0.5$ here. We can also see this as a 3-D plot to get a sense of normality from three different angles.
+
+```{r, fig.width=8, fig.height=3}
+ksmooth <- bkde2D(x=X, bandwidth=c(0.3,0.3), gridsize=c(30,30), range.x = list(range(X$X1),range(X$X2)))
+
+par(mfrow=c(1,3), oma = c(5,4,0,0) + 0.1, mar = c(0,0,1,1) + 0.1)
+persp(x=ksmooth$x1, y=ksmooth$x2, z=ksmooth$fhat+.Machine$double.eps, theta=40, phi=50, col="green3", scale=TRUE,
+      zlim = c(0.000000, max(ksmooth$fhat)+.Machine$double.eps), box=TRUE, shade=0.45, ltheta=-120, border=NA,
+      xlab="X1", ylab="X2", zlab="Bivariate density")
+
+persp(x=ksmooth$x1, y=ksmooth$x2, z=ksmooth$fhat+.Machine$double.eps, theta=0, phi=90, col="green3", scale=TRUE,
+      zlim = c(0.000000, max(ksmooth$fhat)+.Machine$double.eps), box=FALSE, shade=0.45, ltheta=-120, border=NA,
+      xlab="X1", ylab="X2", zlab="Bivariate density")
+
+persp(x=ksmooth$x1, y=ksmooth$x2, z=ksmooth$fhat+.Machine$double.eps, theta=0, phi=20, col="green3", scale=TRUE,
+      zlim = c(0.000000, max(ksmooth$fhat)+.Machine$double.eps), box=TRUE, shade=0.45, ltheta=-120, border=NA,
+      xlab="X1", ylab="X2", zlab="Bivariate density")
+
+```
+
+
+If we set the covariance of $X_1$ and $X_2$ to zero (i.e., $\Sigma_{1,2}$), we would see a circular bivariate distribution:
 
 ```{r}
 Sigma[1,2] <- Sigma[2,1] <- 0 #nullify covariance
@@ -363,6 +394,26 @@ X <- data.frame(mvrnorm(5000, mu = mu, Sigma = Sigma, empirical=TRUE))  # from M
 
 ggplot(X, aes(x=X1, y=X2)) + stat_density_2d(geom = "raster", aes(fill = ..density..), contour = FALSE) +
   scale_fill_viridis(option="plasma") + coord_equal()
+
+```
+
+Or with 3-D perspective:
+
+```{r, fig.width=8, fig.height=3}
+ksmooth <- bkde2D(x=X, bandwidth=c(0.3,0.3), gridsize=c(30,30), range.x = list(range(X$X1),range(X$X2)))
+
+par(mfrow=c(1,3), oma = c(5,4,0,0) + 0.1, mar = c(0,0,1,1) + 0.1)
+persp(x=ksmooth$x1, y=ksmooth$x2, z=ksmooth$fhat+.Machine$double.eps, theta=40, phi=50, col="green3", scale=TRUE,
+      zlim = c(0.000000, max(ksmooth$fhat)+.Machine$double.eps), box=TRUE, shade=0.45, ltheta=-120, border=NA,
+      xlab="X1", ylab="X2", zlab="Bivariate density")
+
+persp(x=ksmooth$x1, y=ksmooth$x2, z=ksmooth$fhat+.Machine$double.eps, theta=0, phi=90, col="green3", scale=TRUE,
+      zlim = c(0.000000, max(ksmooth$fhat)+.Machine$double.eps), box=FALSE, shade=0.45, ltheta=-120, border=NA,
+      xlab="X1", ylab="X2", zlab="Bivariate density")
+
+persp(x=ksmooth$x1, y=ksmooth$x2, z=ksmooth$fhat+.Machine$double.eps, theta=0, phi=20, col="green3", scale=TRUE,
+      zlim = c(0.000000, max(ksmooth$fhat)+.Machine$double.eps), box=TRUE, shade=0.45, ltheta=-120, border=NA,
+      xlab="X1", ylab="X2", zlab="Bivariate density")
 
 ```
 
