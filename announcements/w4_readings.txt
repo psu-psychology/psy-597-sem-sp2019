@@ -1,0 +1,13 @@
+Hi all,
+
+For next week, we will step back from a specific instantiation of SEM to talk about the ideas of latent variables and maximum likelihood estimation. Maximum likelihood methods underlie much of SEM and are essential for estimating parameters related to latent variables.
+
+Please read:
+
+1. Bollen latent variables chapter posted in Files > Week 4.
+
+2. Enders Introduction to Maximum Likelihood in Files > Week 4. This is the most accessible explanation of ML I've read and is an outstanding introduction to parameter estimation in general.
+
+3. Kline Chapter 12, Estimation and Local Fitting.
+
+Michael

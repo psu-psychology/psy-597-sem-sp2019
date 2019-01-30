@@ -43,6 +43,4 @@ If you already cloned a local copy of the repo, you can get the latest updates u
 4.  Latent Variables
     -  [Lecture](04_latent_variables_estimation/latent_variables.html)
     -  [Maximum Likelihood](04_latent_variables_estimation/maximum_likelihood.html)
-
-
-
+5.  [Psychometrics](05_psychometrics/psychometrics_overview.html)
