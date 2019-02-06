@@ -308,7 +308,7 @@ The validity of a test refers to the interpretability of test scores for an inte
 2.  Validity is a matter of degree.
 3.  Validity depends on psychological explanation, composed of both theory and empirical evidence.
 4.  Tests are contextually constrained. Thus, a test can only be valid in an appropriate, validated context.
-5.  Validation is more of a journal through the nomological network than a statistical model.
+5.  Validation is more of a journey through the nomological network than a statistical model.
 
 ## Construct validity
 

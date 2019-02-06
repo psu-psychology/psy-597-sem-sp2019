@@ -2863,8 +2863,8 @@ Response -&gt; Measurement [label=&#39;Inference&#39;];
 {rank=same; Measurement -&gt; Construct [constraint=false];}
 
 }&quot;)</code></pre>
-<div id="htmlwidget-c3e29813cb465ece2d7d" style="width:672px;height:480px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c3e29813cb465ece2d7d">{"x":{"diagram":"\ndigraph psychometrics {\n  rankdir=\"LR\";\n  # a \"graph\" statement\n  graph [overlap = false, fontsize = 12]\n\n  node [shape = oval, fontname = Arial, fixedsize=true; width=1.5; height=0.8;]\n  Construct; Items; Measurement [label=\"Measurement\nModel\"]; Response [label=\"Response\nSpace\"]; \n\n{rank=same; Items -> Response;}\nConstruct -> Items [label=\"Causality\"];\nResponse -> Measurement [label=\"Inference\"];\n{rank=same; Measurement -> Construct [constraint=false];}\n\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-1859d32c866d8964ff7e" style="width:672px;height:480px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1859d32c866d8964ff7e">{"x":{"diagram":"\ndigraph psychometrics {\n  rankdir=\"LR\";\n  # a \"graph\" statement\n  graph [overlap = false, fontsize = 12]\n\n  node [shape = oval, fontname = Arial, fixedsize=true; width=1.5; height=0.8;]\n  Construct; Items; Measurement [label=\"Measurement\nModel\"]; Response [label=\"Response\nSpace\"]; \n\n{rank=same; Items -> Response;}\nConstruct -> Items [label=\"Causality\"];\nResponse -> Measurement [label=\"Inference\"];\n{rank=same; Measurement -> Construct [constraint=false];}\n\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="context" class="section level2">
 <h2><span class="header-section-number">2.2</span> Context</h2>
@@ -2943,14 +2943,14 @@ psych::describe(abcd)</code></pre>
 <td align="right">1000</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">0.002</td>
-<td align="right">-0.007</td>
-<td align="right">0.986</td>
-<td align="right">-3.08</td>
-<td align="right">2.98</td>
-<td align="right">6.06</td>
-<td align="right">0.022</td>
-<td align="right">-0.085</td>
+<td align="right">0.006</td>
+<td align="right">0.011</td>
+<td align="right">0.972</td>
+<td align="right">-2.90</td>
+<td align="right">2.97</td>
+<td align="right">5.87</td>
+<td align="right">-0.087</td>
+<td align="right">-0.002</td>
 <td align="right">0.032</td>
 </tr>
 <tr class="even">
@@ -2960,13 +2960,13 @@ psych::describe(abcd)</code></pre>
 <td align="right">0</td>
 <td align="right">1</td>
 <td align="right">0.022</td>
-<td align="right">0.006</td>
-<td align="right">1.037</td>
-<td align="right">-3.41</td>
-<td align="right">2.87</td>
-<td align="right">6.28</td>
-<td align="right">-0.070</td>
-<td align="right">-0.230</td>
+<td align="right">0.001</td>
+<td align="right">0.982</td>
+<td align="right">-3.08</td>
+<td align="right">3.17</td>
+<td align="right">6.25</td>
+<td align="right">0.005</td>
+<td align="right">0.059</td>
 <td align="right">0.032</td>
 </tr>
 <tr class="odd">
@@ -2975,14 +2975,14 @@ psych::describe(abcd)</code></pre>
 <td align="right">1000</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">0.025</td>
-<td align="right">0.013</td>
-<td align="right">0.985</td>
-<td align="right">-3.43</td>
-<td align="right">3.47</td>
-<td align="right">6.90</td>
-<td align="right">-0.109</td>
-<td align="right">0.067</td>
+<td align="right">0.058</td>
+<td align="right">0.012</td>
+<td align="right">0.996</td>
+<td align="right">-3.10</td>
+<td align="right">3.53</td>
+<td align="right">6.62</td>
+<td align="right">-0.099</td>
+<td align="right">-0.158</td>
 <td align="right">0.032</td>
 </tr>
 <tr class="even">
@@ -2991,14 +2991,14 @@ psych::describe(abcd)</code></pre>
 <td align="right">1000</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">0.028</td>
-<td align="right">-0.002</td>
-<td align="right">1.019</td>
-<td align="right">-3.65</td>
-<td align="right">3.26</td>
-<td align="right">6.92</td>
-<td align="right">-0.016</td>
-<td align="right">-0.053</td>
+<td align="right">-0.003</td>
+<td align="right">-0.005</td>
+<td align="right">1.005</td>
+<td align="right">-3.00</td>
+<td align="right">3.00</td>
+<td align="right">6.00</td>
+<td align="right">0.067</td>
+<td align="right">-0.126</td>
 <td align="right">0.032</td>
 </tr>
 </tbody>
@@ -3036,8 +3036,8 @@ print(coefficient_alpha)</code></pre>
 ## Reliability analysis   
 ## Call: psych::alpha(x = abcd)
 ## 
-##   raw_alpha std.alpha G6(smc) average_r S/N   ase   mean   sd median_r
-##       0.73      0.73    0.74       0.4 2.7 0.014 -6e-18 0.74     0.35
+##   raw_alpha std.alpha G6(smc) average_r S/N   ase    mean   sd median_r
+##       0.73      0.73    0.74       0.4 2.7 0.014 7.7e-18 0.74     0.35
 ## 
 ##  lower alpha upper     95% confidence boundaries
 ## 0.7 0.73 0.76 
@@ -3051,10 +3051,10 @@ print(coefficient_alpha)</code></pre>
 ## 
 ##  Item statistics 
 ##      n raw.r std.r r.cor r.drop     mean sd
-## A 1000  0.64  0.64  0.44   0.37  4.0e-18  1
-## B 1000  0.81  0.81  0.78   0.63 -5.4e-18  1
-## C 1000  0.78  0.78  0.72   0.57 -1.2e-17  1
-## D 1000  0.74  0.74  0.61   0.52 -1.5e-17  1</code></pre>
+## A 1000  0.64  0.64  0.44   0.37 -2.0e-18  1
+## B 1000  0.81  0.81  0.78   0.63 -1.0e-17  1
+## C 1000  0.78  0.78  0.72   0.57  7.4e-18  1
+## D 1000  0.74  0.74  0.61   0.52  3.4e-17  1</code></pre>
 <p>Notice how coefficient alpha can be recomputed if a given item is dropped from the scale. Thus, items that have low positive covariance with the others will tend to detract from the numerator of the calculation, while not sytematically changing the denominator, driving the alpha estimate down. Altogether, the intuition is that greater positive <em>covariation</em> among items relative to their variation in their sum helps to quantify internal consistency, a measure of reliability.</p>
 <p>One solution for improving a scale’s internal consistency is to identify items that have stronger inter-item correlations, either by developing the item pool, or dropping items with low inter-item covariation.</p>
 </div>
@@ -3103,7 +3103,7 @@ r^2_i = \sum_{j=1}^{m}\lambda_{ij}^2
 <li>Validity is a matter of degree.</li>
 <li>Validity depends on psychological explanation, composed of both theory and empirical evidence.</li>
 <li>Tests are contextually constrained. Thus, a test can only be valid in an appropriate, validated context.</li>
-<li>Validation is more of a journal through the nomological network than a statistical model.</li>
+<li>Validation is more of a journey through the nomological network than a statistical model.</li>
 </ol>
 <div id="construct-validity" class="section level2">
 <h2><span class="header-section-number">6.1</span> Construct validity</h2>
