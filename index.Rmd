@@ -46,3 +46,5 @@ If you already cloned a local copy of the repo, you can get the latest updates u
 5.  Psychometrics
     - [Lecture](05_psychometrics/psychometrics_overview.html)
     - [Latent Variable Simulation](05_psychometrics/lv_sim.html)
+6.  [Factor Models](06_factor_models/factor_models.html)
+
