@@ -149,7 +149,7 @@ A potential issue with using ULI for scaling may occur if the reliability of ind
 Using **UVI** standardizes a latent variable by fixing its variance to 1, which may provide the advantage of simplicity (e.g., using z-scores instead of undstandardized predictors in a regression model).  However, UVI is generally only applicable to *exogenous* variables as the variance terms of endogenous variables are *freely estimated* as disturbances in an SEM and cannot be constrained. While in a model with no structural component (e.g., CFA) this is not an issue, full SEM models may require using ULI rather than UVI for endogenous variables.  Furthermore, using UVI in SEM with multiple groups with significantly different factor variance estimates, or in longitudinal analyses where variances change over time, will result in a lost of potentially meaningful information.  
 Notably, the scaling requirement to constrain either factor loadings or variances to 1 reduces the number of freely estimated parameters in a CFA model.  
 
-## Examples of CFA identication
+## Examples of CFA identification
 
 We can see in the following examples (drawn from Kline figure 9.5, p. 202) how to evaluate the identification status of various models and confirm the minimum indicators rule outlined above.
 
@@ -178,7 +178,6 @@ Or with UVI instead of ULI...
 
 #9.5c: Overidentified (10 variances/covariances - 9 free parameters = 1 df)
 ```
-
 
 <center></center>
 

@@ -50,5 +50,7 @@ If you already cloned a local copy of the repo, you can get the latest updates u
 7.  Full SEM
     -  [Model specification](07_full_sem/full_sem_specification.html)
     -  [Model estimation demo](07_full_sem/full_sem_demo.html)
-
-
+8.  Model fit and modification
+    -  [Lecture](08_fit/sem_fit_modification.html)
+    
+    
