@@ -344,6 +344,14 @@ $$
 $$
 By taking the max of each operand, CFI is formally bounded between 0 and 1. Importantly, CFI is not affected by $N$ and has performed well in simulation studies relative to similar indices such as TLI. Finally, note that there is a very similar measure called relative noncentrality index (RNI) that differs from CFI primarily in that it can go above 1.0 in the same way as TLI.
 
+## Challenges of practical fit indices
+
+Many, if not most, of the practical indices described above cannot be interpreted blindly according to the rules of thumb above. Indeed, these rules of thumb were primarily developed for models containing only *covariance* structure, but not *means*. We'll get to mean structure later in the class, but suffice it to say that most fit indices struggle to balance misfit in the mean structure and covariance structure. Is a model that fits one well, but not the other, considered 'good?' For example, SRMR typically ignores mean structure altogether (since it is based on comparisons of covariance elements), so a model with poor representation of means could have a low SRMR.
+
+There is also a challenge of specifying an appropriate baseline model in more complex SEMs, especially ones that include mean structure. Likewise, some models do not have a proper saturated model, such as models with specific patterns of missing data. The short version is to interpret global fit indices with caution and always to examine the fit of each part of the model (residuals are useful).
+
+One may be tempted to modify a model according to modification indices in order to improve global fit, but atheoretically (fit) motivated modifications are unlikely to replicate in an independent sample. As West notes, model modification can often shift the epistemological perspective from confirmatory (a priori model) to (partially) exploratory. Exercise caution!
+
 ## tl;dr summary of global fit statistics
 
 Kline suggests reporting the following minimal set of fit indices (and I agree):
@@ -356,14 +364,6 @@ Kline suggests reporting the following minimal set of fit indices (and I agree):
 Altogether, many of the other fit indices that have been developed for SEM try to overcome dependence on $N$. Here's the tl;dr synopsis from the West et al. chapter.
 
 ![](goodness_of_fit_table.png)
-
-## Challenges of practical fit indices
-
-Many, if not most, of the practical indices described above cannot be interpreted blindly according to the rules of thumb above. Indeed, these rules of thumb were primarily developed for models containing only *covariance* structure, but not *means*. We'll get to mean structure later in the class, but suffice it to say that most fit indices struggle to balance misfit in the mean structure and covariance structure. Is a model that fits one well, but not the other, considered 'good?' For example, SRMR typically ignores mean structure altogether (since it is based on comparisons of covariance elements), so a model with poor representation of means could have a low SRMR.
-
-There is also a challenge of specifying an appropriate baseline model in more complex SEMs, especially ones that include mean structure. Likewise, some models do not have a proper saturated model, such as models with specific patterns of missing data. The short version is to interpret global fit indices with caution and always to examine the fit of each part of the model (residuals are useful).
-
-One may be tempted to modify a model according to modification indices in order to improve global fit, but atheoretically (fit) motivated modifications are unlikely to replicate in an independent sample. As West notes, model modification can often shift the epistemological perspective from confirmatory (a priori model) to (partially) exploratory. Exercise caution!
 
 # Local fit
 

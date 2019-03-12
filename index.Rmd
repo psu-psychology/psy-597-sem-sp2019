@@ -53,4 +53,3 @@ If you already cloned a local copy of the repo, you can get the latest updates u
 8.  Model fit and modification
     -  [Lecture](08_fit/sem_fit_modification.html)
     
-    
