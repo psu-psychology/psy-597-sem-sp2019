@@ -411,7 +411,11 @@ Are these models nested?
 anova(l1fac_m, hcfa_m)
 nonnest2::vuongtest(l1fac_m, hcfa_m)
 aa <- aictab(list(l1fac_m, hcfa_m))
+
 print(aa)
+
+cat("Evidence ratio of higher-order factor model versus first-order model\n")
+evidence(aa)
 ```
 
 ## Bentler NET approach
