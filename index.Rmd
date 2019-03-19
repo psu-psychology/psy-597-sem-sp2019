@@ -52,4 +52,5 @@ If you already cloned a local copy of the repo, you can get the latest updates u
     -  [Model estimation demo](07_full_sem/full_sem_demo.html)
 8.  Model fit and modification
     -  [Lecture](08_fit/sem_fit_modification.html)
-    
+9.  Model comparison and relative evidence
+    -  [Lecture](09_model_comparison/model_comparison.html)
