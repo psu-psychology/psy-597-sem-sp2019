@@ -33,7 +33,7 @@ ol li:first-child { margin-top: 1.5em; }
 
 ```{r setup, include=FALSE}
 if (!require(pacman)) { install.packages("pacman"); library(pacman) }
-p_load(knitr, MASS, tidyverse, viridis, lavaan, modelr, semPlot, psych, nonnest2, semTools) #AICcmodavg
+p_load(knitr, MASS, tidyverse, viridis, lavaan, modelr, semPlot, psych, nonnest2, semTools, AICcmodavg)
 knitr::opts_chunk$set(echo = TRUE) #print code by default
 options(digits=3)
 set.seed(15092) #to make simulated data the same across computers
@@ -201,7 +201,7 @@ fitmeasures(f4)["chisq"]
 
 3.  Models with many paths suffer from many equivalents. Can you test your key hypotheses in models with fewer variables?
 
-4.  Consider including ancillary variables that are not related to the original set in the model. In particular, consider adding antecedents (predictors) of variables in a source block such that they do not have any relationship to the focal (destination) block:
+4.  Consider including ancillary variables that are not related to the original set in the model. In particular, consider adding antecedents (predictors) of variables in a source block such that they do not have any relationship to the focal (destination) block.
 
 # Are two models nested, non-nested, or equivalent?
 
@@ -410,8 +410,8 @@ Are these models nested?
 ```{r}
 anova(l1fac_m, hcfa_m)
 nonnest2::vuongtest(l1fac_m, hcfa_m)
-#aa <- aictab(list(l1fac_m, hcfa_m))
-#print(aa)
+aa <- aictab(list(l1fac_m, hcfa_m))
+print(aa)
 ```
 
 ## Bentler NET approach

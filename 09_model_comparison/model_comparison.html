@@ -670,7 +670,7 @@ semPaths_default(f4)</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li><p>The closer the model is to saturated, the larger the number of equivalent models. When possible, try to test a relatively sparse structural model. More specifically, in saturated <em>blocks</em>, there is little information to adjudicate directionality. Thus, it is useful to include structural variables that are thought to be <em>unrelated</em> to others.</p></li>
 <li><p>Models with many paths suffer from many equivalents. Can you test your key hypotheses in models with fewer variables?</p></li>
-<li><p>Consider including ancillary variables that are not related to the original set in the model. In particular, consider adding antecedents (predictors) of variables in a source block such that they do not have any relationship to the focal (destination) block:</p></li>
+<li><p>Consider including ancillary variables that are not related to the original set in the model. In particular, consider adding antecedents (predictors) of variables in a source block such that they do not have any relationship to the focal (destination) block.</p></li>
 </ol>
 </div>
 </div>
@@ -1104,8 +1104,16 @@ summary(hcfa_m, fit.measures=TRUE, standardized=TRUE)</code></pre>
 ##     z = 0.094,   p = 0.462
 ##   H1B: Model 2 fits better than Model 1 
 ##     z = 0.094,   p = 0.5375</code></pre>
-<pre class="r"><code>#aa &lt;- aictab(list(l1fac_m, hcfa_m))
-#print(aa)</code></pre>
+<pre class="r"><code>aa &lt;- aictab(list(l1fac_m, hcfa_m))</code></pre>
+<pre><code>## Warning in aictab.AIClavaan(list(l1fac_m, hcfa_m)): 
+## Model names have been supplied automatically in the table</code></pre>
+<pre class="r"><code>print(aa)</code></pre>
+<pre><code>## 
+## Model selection based on AICc:
+## 
+##       K  AICc Delta_AICc AICcWt Cum.Wt    LL
+## Mod2 29 11351       0.00   0.78   0.78 -5643
+## Mod1 30 11353       2.49   0.22   1.00 -5643</code></pre>
 </div>
 <div id="bentler-net-approach" class="section level2">
 <h2><span class="header-section-number">6.4</span> Bentler NET approach</h2>
