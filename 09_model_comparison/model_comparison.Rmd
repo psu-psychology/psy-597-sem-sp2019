@@ -205,7 +205,15 @@ fitmeasures(f4)["chisq"]
 
 # Are two models nested, non-nested, or equivalent?
 
-Bentler and Satorra (2010) defined a useful nested model test:
+When we are considering two or more alternative models, we need to undersetand their relationships to each other. Models can be *nested*, *non-nested*, or *equivalent*.
+
+Conceptually, model A is nested in model B if model A contains a subset of the parameters in model B. For example, if we remove a correlation between factors in one model, but estimate it in the other, then the restricted model (zero covariance between factors) is nested in the full model. Thus, it is no surprise that the correlated factors model can capture the predictions of the uncorrelated factors model because it can estimate the correlation of zero.
+
+Non-nested models contain parameters that do not represent a part versus whole kind of relationship -- that is, the parameters of one model are not a subset of the other.
+
+And equivalent models, as we've seen above, have the same sample likelihood and degrees of freedom, even though they may have substantively different interpretations (e.g., changing the sign of a directed path).
+
+Bentler and Satorra (2010) defined a useful nesting and equivalence testing (NET) procedure:
 
 1.  Conduct typical SEM on Model $M1$. Save the $df_{M1}$ and model-implied covariance $\boldsymbol{\Sigma}(\hat{\boldsymbol{\theta}})$.
 
@@ -220,113 +228,7 @@ Bentler and Satorra (2010) defined a useful nested model test:
 
 The primary idea is that when there are more degrees of freedom in $M1$ than $M2$ *and* the model-implied covariance matrix can be reproduced by $M2$, then $M1$ is nested in $M2$.
 
-
-# Model evidence, K-L distance
-
-"All models are wrong but some are useful" - *George Box*
-
-The goal of most statistical modeling is to approximate the key factors that generated our empirical data. The data generation processes are usually complex and largely unknown, so our models will almost always be deficient in many ways. Nevertheless, we may wish to know how close one model is to the unknown truth relative to a comparator model. This is the substance of model selection theory -- i.e., how one selects among models based on relative evidence.
-
-Kullback-Leibler information quantifies the information lost when lost when a simple model, *g* is used to approximate the true model, *f*:
-
-$$
-I(f,g) = \int{f(x) \textrm{log} \left( \frac{f(x)}{g(x|\theta)} \right) dx}
-$$
-This can also be thought of as the distance between our model, *g* and the population (unknown) model, *f*.
-
-![](K-L_Distance.png)
-
-In the simplest case, we can think of trying to identify a probability distribution (e.g., Gaussian) that best describes a given empirical sample. Recall from the M-L lecture our attempt to fit a Gaussian distribution using a Gamma distribution. The sample likelihood for the Gamma, even at optimized (fitted) parameters, can never be as close as a Gaussian fit.
-
-*ML Gamma fit*
-```{r}
-X <- rnorm(5000, mean=50, sd=sqrt(50))
-gfit <- suppressWarnings(fitdistr(X, "gamma"))
-gfit$loglik
-datafromgam <- rgamma(n=5000, shape=gfit$estimate["shape"], rate=gfit$estimate["rate"])
-```
-
-*ML Gaussian fit*
-```{r}
-gfit <- suppressWarnings(fitdistr(X, "normal"))
-gfit$loglik
-datafromgauss <- rnorm(n=5000, mean=gfit$estimate["mean"], sd=gfit$estimate["sd"])
-
-df <- data.frame(model=rep(c("groundtruth", "gamma", "gauss"), each=5000), 
-                           v=c(X, datafromgam, datafromgauss))
-                 
-ggplot(df, aes(x=v, color=model)) + geom_density()
-```
-
-The sample *LL* is an approximation of a K-L distance between a model and 'truth', but read on to AIC below...
-
-In general, we do not know the true model, which means we cannot compute the exact K-L distance. Fortunately, however, we are often interested in *relative* distance -- that is, how much better is model A than model B? In this circumstance, the K-L distance derivation includes two terms: one is based on the expectation under the 'true' model (can't compute that!), the other is based on the *relative* distance between the model and the truth. 
-
-Since we can't compute the first term, it means we do not have a measure of *absolute* fit using likelihood-based and K-L methods. But, because we can compute the relative distance, we can also compute the relative distance *between* two or more models. As a result, we can compare *relative evidence* across a set of candidate models. All may be bad, or all may be good, by some absolute criterion, but we can ascertain which is relatively best. Global fit criteria in SEM often give some information about the absolute fit (esp. residual-based methods). Likelihood methods (K-L distance) are more about relative evidence.
-
-K-L distances are on a true ratio scale (i.e., a meaningful zero point and equal interval spacing). As a result, *differences* in distances can be compared, and a zero K-L difference implies identical relative fit. Moreover, K-L distances tend to become larger as the sample size increases. By analogy, AIC differences among models tend to be larger in large samples compared to small ones. This does not mean that the scaling or interpretation changes! Rather, it underscores that discriminating among models becomes easier in large samples.
-
-## Akaike Information Criterion (AIC)
-
-The derivation of the AIC was a major breakthrough in information theory and statistics because it provides a statistical link between K-L distance (a more theoretical notion) and maximum likelihood-based methods.
-
-The AIC provides an approximation of the relative distance of the fitted model and the unknown (true) mechanisms that generated the data. Importantly, it is a *large sample* criterion (based on asymptotic properties, so 1000s, ideally) and is also not especially meaningful if the models in question are simply inappropriate or poor (e.g., fitting a binary outcome with a continuous model).
-
-$$
-AIC = -2 \textrm{log} (\mathcal{L}(\hat{\theta}|y)) + 2k
-$$
-where $k$ is the number of free parameters, and $\mathcal{L}(\hat{\theta}|y)$ is the sample likelihood.
-
-Note that by multiplying the *LL* by -2, the criterion is now scaled such that *lower* values are better. By contrast, for *LL*, higher values indicate better fit (greater likelihood of the data given the model).
-
-## Corrected AIC
-
-Because AIC is based on a large sample derivation (i.e., its statistical properties are ideal as the sample size goes to infinity), it may select overly complex models in smaller samples (think hundreds, not thousands). This led to the derivation of a variant of AIC, usually denoted $AIC_C$ (Sugiura, 1978), that includes an additional penalty for sample size:
-
-$$
-AIC_C = -2 \textrm{log} (\mathcal{L}(\hat{\theta}|y)) + 2k + \frac{2k(k+1)}{n - k -1}
-$$
-When your cases:parameters ratio is below 40 (which it usually is!), Burnham and Anderson recommend this over AIC. But this was derived for univariate (one DV) regression, not SEM. There is not an equivalent in SEM (that I know of), but also not a specific reason that the above derivation is not approximately correct. Nevertheless, there is (to my knowledge) no consensus on whether $AIC_C$ should be preferred to the standard $AIC$ in SEM.
-
-# Comparing relative evidence of candidate SEMs
-
-One of the most important considerations when comparing non-nested models is that the set of endogenous variables is *the same* and on the same scale! This is often misunderstood in applied papers and can lead to bizarre circumstances where AICs differ by thousands of points. That's not impossible, but more likely to reflect differences in the likelihood function that render models non-comparable using LL-based methods (incl. AIC/BIC).
-
-Recall that the sample likelihood is computed on the *endogenous* variables. Thus, if the endogenous set changes (e.g., changing the direction of an arrow), LL methods cannot necessarily be compared. In `lavaan`, this relates to the `conditional.x` option. See `?lavOptions`. If it is `FALSE`, then model-implied statistics, including LL, reflect both exogenous and endogenous variables. This is likely what you'd want in cases where you're testing alternative models with paths direction changes that would make an endogenous variable exogenous, or vice versa.
-
-If you're not sure, check the unrestricted (saturated) LL for the two candidate models. If they are not identical, you cannot use AIC/BIC to compare them. You might also check your setting of `conditional.x` in `lavaan`. Fortunately, `lavaan` will usually provide a warning: "WARNING: some models are based on a different set of observed variables." If you see that, *watch out*! Your models are almost definitely not comparable, either in terms of LRT (nested) or AIC/BIC (non-nested) comparisons since both are based on the sample likelihood.
-
-## Comparing non-nested models
-
-See this paper from Ed Merkle: https://arxiv.org/pdf/1402.6720.pdf. And the corresponding `nonnest2` package in R.
-
-Briefly, the Vuong test is often a useful way to compare evidence among models, including non-nested models. The package plays well with `lavaan`.
-
-(Some quotes from Hallquist & Pilkonis, 2010)
-
-## Efficiency (AIC)
-
-AIC is an asymptotically efficient criterion for model selection, which means that it tends to select the model that minimizes prediction error as sample size increases. More generally, AIC is an information criterion primarily concerned with minimizing the relative Kullback-Leibler (K-L) distance between a statistical model and the unknown mechanisms giving rise to the observed data (Claeskens & Hjort, 2008). 
-
-An underlying assumption of AIC is that the “truth” of the data is very complex (i.e., many causal factors of varying strengths) and that no one “true model” exists (Burnham & Anderson, 2002). Thus, AIC is useful for selecting the best approximate model using a finite number of parameters when “truth” is countably infinite.
-
-## Consistency (BIC)
-
-By contrast, the BIC originates from the Bayesian tradition in statistics and is concerned with the statistical property of consistency, which refers to the one “true model” being selected with increasing probability as sample size increases (Yang, 2005). Underlying the property of consistency are several assumptions worth examining: (1) a single “true” model exists that best represents the mechanisms that gave rise to the observed data, (2) one of the models in the set of models tested is the “true” model, and (3) the focus of model selection is to identify the “true” model rather than to provide a close approximation to the truth. Given these assumptions, Burnham and Anderson (2002) have argued against the use of consistent model selection criteria in the biological, medical, and social sciences because such data are highly complex, there is a low likelihood of including the “true model” in any set of models considered, and it is unlikely that a single “true model” exists.
-
-## Comparing models based on AIC or BIC differences
-
-Summarizing extensive simulation work, Burnham and Anderson (2002) offer useful rules-of-thumb for inferring the degree of certainty afforded to a particular model relative to the best fitting model in the set: 
-
--  models within 0–2 points on the AIC also have substantial support
--  models in the 4–7 point range have considerably less support
--  models greater than 10 points apart have almost no support. 
-
-Moreover, AIC values for a set of models can be subtracted from the model with the lowest AIC value and these difference scores can be transformed into a set of Akaike weights that represent the evidential weight of a particular model relative to all other models in the set (Burnham & Anderson, 2002). The important general point is that conclusions drawn from latent variable models would benefit from being contextualized in terms of model selection uncertainty and the degree of support for one model over alternatives.
-
-For details on Akaike weights or evidence ratios, I would recommend checking out the `AICcmodavg` package. See demo below.
-
-# Demo
+# Demo of model comparison
 
 From Brown Ch. 8, Fig 8.1. This is a measure of coping styles administered to 275 college students. There are four first-order latent variables, which reflect different ways of coping with stress: Problem Solving, Cognitive Restructuring, Express Emotions, and Social Support. The authors also anticipated that there are two higher-order factors that account for correlations among the first-order factors: Problem-Focused Coping and Emotion-Focused Coping.
 
@@ -403,26 +305,11 @@ summary(hcfa_m, fit.measures=TRUE, standardized=TRUE)
 semPaths_default(hcfa_m, sizeMan=7)
 ```
 
-## Model comparison
-
-Are these models nested?
-
-```{r}
-anova(l1fac_m, hcfa_m)
-nonnest2::vuongtest(l1fac_m, hcfa_m)
-aa <- aictab(list(l1fac_m, hcfa_m))
-
-print(aa)
-
-cat("Evidence ratio of higher-order factor model versus first-order model\n")
-evidence(aa)
-```
-
 ## Bentler NET approach
 
-We can test whether models are nested, equivalent, or not nested using Bentler's nesting and equivalent testing procedure. As mentioned above, this involves fitting model 1 using a candidate SEM, saving the model-implied covariance matrix, then fitting model 2 using that matrix as the input. We examine the difference in degrees of freedom. If $df_1 - df_2 > 0$ and the $\chi^2$ of model 2 is essentially zero (usually < .001) then we say model 1 is nested in model 2. Note that this is an asymmetric test. Model 1 may not be nested in model 2, but the converse (2 nested in 1) could be.
+We can test whether models are nested, equivalent, or not nested using Bentler's nesting and equivalent testing procedure (NET). As mentioned above, this involves fitting model 1 using a candidate SEM, saving the model-implied covariance matrix, then fitting model 2 using that matrix as the input. We examine the difference in degrees of freedom. If $df_1 - df_2 > 0$ and the $\chi^2$ of model 2 is essentially zero (usually < .001) then we say model 1 is nested in model 2. Note that this is an asymmetric test. Model 1 may not be nested in model 2, but the converse (2 nested in 1) could be.
 
-## Is saturated model nested in hierarchical model?
+## Is the saturated structural model nested in hierarchical factor model?
 
 Following Bentler steps:
 
@@ -440,7 +327,7 @@ cat("Chi-square for NET test: ", chi2, "\n")
 
 ```
 
-We see that the degrees of freedom difference is negative. Thus, the saturated model is not nested in the hierarchical model. This makes sense intuitively in that the hierarhical model imposes some structure on the factor model, whereas the saturated model estimates unique covariances among factors.
+We see that the degrees of freedom difference is negative. Thus, the saturated model is not nested in the hierarchical model. This makes sense intuitively in that the hierarchical model imposes some structure on the factor model, whereas the saturated model estimates unique covariances among factors.
 
 ## Is the hierarchical model nested in the saturated model?
 
@@ -465,10 +352,159 @@ Here, we see the expected result for a nested model: the df difference is positi
 
 ## Conducting NET the easy way
 
-The `semTools` package provides a `net()` function that will compute nesting/equivalence tests for all pairs of models passed in (as separate arguments). This package also provides the `moreFitIndices` function, which provides the $AIC_C$ as `aic.smallN`.
+The `semTools` package provides a `net()` function that will compute nesting/equivalence tests for all pairs of models passed in (as separate arguments). This package also provides the `moreFitIndices` function, which provides the $AIC_C$ as `aic.smallN` (see below for its role in model evidence).
 
 ```{r}
 #the easy way
 semTools::net(l1fac_m, hcfa_m)
 semTools::moreFitIndices(l1fac_m)
 ```
+
+# Model evidence, K-L distance
+
+"All models are wrong but some are useful" - *George Box*
+
+Having established whether two models are nested, not nested, or equivalent, we can move onto the important consideration of model evidence. In the case of equivalent models, relative evidence cannot be based on global fit given that both models will have the same likelihood and same number of parameters (see above for potential solutions to this problem). But in the case of non-nested and nested models, we would like to be able to make a statement such as, "Model A fits the data significantly better than Model B, *p* < .01," or, "The evidence for Model A is ten times stronger than the evidence for Model B." 
+
+## Binary judgments: likelihood ratios and Vuong tests
+
+The first statement concerns a *binary* judgment about model fit -- that is, we are interested in testing the null hypothesis that two models fit the data equally well. We have seen this approach in previous weeks when using the likelihood ratio test (LRT) -- aka the model chi-square difference test. In the LRT approach, we can compare two *nested* models (using the `anova` function in `lavaan`) to test the null hypothesis that one model (with fewer parameters -- the nested model) fit the data equally well. If we reject this null (typically $p < .05$), then we conclude that the nested model fits significantly *worse* than the full model.
+
+In our example above, we learned from NET (and could figure out intuitively) that the models are nested. Does the hierarchical factor model (nested) fit significantly worse than the first-order factor model (full)?
+
+```{r}
+anova(l1fac_m, hcfa_m)
+```
+
+No, we do not reject the null, meaning that we conclude that the nested model (hierarchical factors) does not fit significantly worse than the full model (saturated associations among first-order factors), $p = .85$. Thus, even though the hierarchical factor model has one less free parameter (and thus, one additional degree of freedom), it does not fit significantly worse. Typically, in this case, we would retain the simpler model given that its fit is not worse.
+
+If we are interested in binary comparisons of *non-nested* models, we can usually use a Vuong test, which will also provide a test of the null hypothesis that one model as well as an alternative. See this paper from Ed Merkle: https://arxiv.org/pdf/1402.6720.pdf. And the corresponding `nonnest2` package in R, which plays well with `lavaan`. Although we know that our models are nested above, we can still apply the Vuong test (using `nested=TRUE`), which yields this output. Note that if we were comparing non-nested models, we would keep `nested=FALSE`!
+
+```{r}
+nonnest2::vuongtest(l1fac_m, hcfa_m, nested=TRUE)
+```
+
+Here, the binary judgments are the same as the LRT above -- the hierarchical factor model does not fit significantly worse than the first-order model.
+
+## Relative evidence and Kullback-Leibler (K-L) distance
+
+These, however, is a *binary* judgment. What about the evidence in favor of the hierarchical model versus the first-order model? This is a dimensional question and could be framed in terms of the probability that one model is the best in the set. For example, is the evidence in factor of the hierarchical factor model three times greater than the first-order model?
+
+To make judgments about *relative* evidence, we need a measure of how well one model fits compared to another (or many others).
+
+The goal of most statistical modeling is to approximate the key factors that generated our empirical data. The data generation processes are usually complex and largely unknown, so our models will almost always be deficient in many ways. Nevertheless, we may wish to know how close one model is to the unknown truth relative to a comparator model. This is the substance of model selection theory -- i.e., how one selects among models based on relative evidence.
+
+Kullback-Leibler information quantifies the information lost when lost when a simple model, *g* is used to approximate the true model, *f*:
+
+$$
+I(f,g) = \int{f(x) \textrm{log} \left( \frac{f(x)}{g(x|\theta)} \right) dx}
+$$
+This can also be thought of as the distance between our model, *g* and the population (unknown) model, *f*.
+
+![](K-L_Distance.png)
+
+In the simplest case, we can think of trying to identify a probability distribution (e.g., Gaussian) that best describes a given empirical sample. Recall from the M-L lecture our attempt to fit a Gaussian distribution using a Gamma distribution. The sample likelihood for the Gamma, even at optimized (fitted) parameters, can never be as close as a Gaussian fit.
+
+*ML Gamma fit*
+```{r}
+X <- rnorm(5000, mean=50, sd=sqrt(50))
+gfit <- suppressWarnings(fitdistr(X, "gamma"))
+gfit$loglik
+datafromgam <- rgamma(n=5000, shape=gfit$estimate["shape"], rate=gfit$estimate["rate"])
+```
+
+*ML Gaussian fit*
+```{r}
+gfit <- suppressWarnings(fitdistr(X, "normal"))
+gfit$loglik
+datafromgauss <- rnorm(n=5000, mean=gfit$estimate["mean"], sd=gfit$estimate["sd"])
+
+df <- data.frame(model=rep(c("groundtruth", "gamma", "gauss"), each=5000), 
+                           v=c(X, datafromgam, datafromgauss))
+                 
+ggplot(df, aes(x=v, color=model)) + geom_density()
+```
+
+The sample *LL* is an approximation of a K-L distance between a model and 'truth', but read on to AIC below...
+
+In general, we do not know the true model, which means we cannot compute the exact K-L distance. Fortunately, however, we are often interested in *relative* distance -- that is, how much better is model A than model B? In this circumstance, the K-L distance derivation includes two terms: one is based on the expectation under the 'true' model (can't compute that!), the other is based on the *relative* distance between the model and the truth. 
+
+Since we can't compute the first term, it means we do not have a measure of *absolute* fit using likelihood-based and K-L methods. But, because we can compute the relative distance, we can also compute the relative distance *between* two or more models. As a result, we can compare *relative evidence* across a set of candidate models. All may be bad, or all may be good, by some absolute criterion, but we can ascertain which is relatively best. Global fit criteria in SEM often give some information about the absolute fit (esp. residual-based methods). Likelihood methods (K-L distance) are more about relative evidence.
+
+K-L distances are on a true ratio scale (i.e., a meaningful zero point and equal interval spacing). As a result, *differences* in distances can be compared, and a zero K-L difference implies identical relative fit. Moreover, K-L distances tend to become larger as the sample size increases. By analogy, AIC differences among models tend to be larger in large samples compared to small ones. This does not mean that the scaling or interpretation changes! Rather, it underscores that discriminating among models becomes easier in large samples.
+
+## Akaike Information Criterion (AIC)
+
+The derivation of the AIC was a major breakthrough in information theory and statistics because it provides a statistical link between K-L distance (a more theoretical notion) and maximum likelihood-based methods.
+
+The AIC provides an approximation of the relative distance of the fitted model and the unknown (true) mechanisms that generated the data. Importantly, it is a *large sample* criterion (based on asymptotic properties, so 1000s, ideally) and is also not especially meaningful if the models in question are simply inappropriate or poor (e.g., fitting a binary outcome with a continuous model).
+
+$$
+AIC = -2 \textrm{log} (\mathcal{L}(\hat{\theta}|y)) + 2k
+$$
+where $k$ is the number of free parameters, and $\mathcal{L}(\hat{\theta}|y)$ is the sample likelihood.
+
+Note that by multiplying the *LL* by -2, the criterion is now scaled such that *lower* values are better. By contrast, for *LL*, higher values indicate better fit (greater likelihood of the data given the model).
+
+## Corrected AIC
+
+Because AIC is based on a large sample derivation (i.e., its statistical properties are ideal as the sample size goes to infinity), it may select overly complex models in smaller samples (think hundreds, not thousands). This led to the derivation of a variant of AIC, usually denoted $AIC_C$ (Sugiura, 1978), that includes an additional penalty for sample size:
+
+$$
+AIC_C = -2 \textrm{log} (\mathcal{L}(\hat{\theta}|y)) + 2k + \frac{2k(k+1)}{n - k -1}
+$$
+
+When your cases:parameters ratio is below 40 (which it usually is!), Burnham and Anderson recommend this over AIC. But this was derived for univariate (one DV) regression, not SEM. There is not an equivalent in SEM (that I know of), but also not a specific reason that the above derivation is not approximately correct. Nevertheless, there is (to my knowledge) no consensus on whether $AIC_C$ should be preferred to the standard $AIC$ in SEM.
+
+# Comparing relative evidence of candidate SEMs
+
+One of the most important considerations when comparing models is that the set of endogenous variables is *the same* and on the same scale! This is often misunderstood in applied papers and can lead to bizarre circumstances where AICs differ by thousands of points. That's not impossible, but more likely to reflect differences in the likelihood function that render models non-comparable using LL-based methods (incl. AIC/BIC). For example, if you log-transform some of the variables, their contribution to the sample likelihood will be remarkably different, rendering models with and without that transformation incomparable (at least in likelihood terms).
+
+Recall that the sample likelihood is computed on the *endogenous* variables. Thus, if the endogenous set changes (e.g., changing the direction of an arrow), LL methods cannot necessarily be compared. In `lavaan`, this relates to the `conditional.x` option. See `?lavOptions`. If it is `FALSE`, then model-implied statistics, including LL, reflect both exogenous and endogenous variables. This is likely what you'd want in cases where you're testing alternative models with paths direction changes that would make an endogenous variable exogenous, or vice versa.
+
+If you're not sure, check the unrestricted (saturated) LL for the two candidate models. If they are not identical, you cannot use AIC/BIC to compare them. You might also check your setting of `conditional.x` in `lavaan`. Fortunately, `lavaan` will usually provide a warning: "WARNING: some models are based on a different set of observed variables." If you see that, *watch out*! Your models are almost definitely not comparable, either in terms of LRT (nested) or AIC/BIC (non-nested) comparisons since both are based on the sample likelihood.
+
+Note that you will come across many "IC" (Information Criterion) measures in SEM and statistics, including the Bayesian information criterion (BIC). A discussion of these measures is beyond the scope of the class, but it's worth mentioning that they have different statistical properties as relates to model selection (i.e., choosing which model fits best). Virtually all of the IC-based approaches build on the sample log-likelihood and are concerned with the *fit-parsimony tradeoff*. That is, we are interested in identifying a model that is as parsimonious as possible, while also fitting the data well. 
+
+We can always improve fit -- that is, sample likelihood -- by adding additional free parameters. Even if the parameters are not useful (e.g., adding a predictor whose p-value is .5), they can only help in fit, even if trivially. This is akin to the motivation for adjusted $R^2$ in regression, where a predictor can only contribute positively to predicted variance in the outcome. Thus, we do not want to prioritize the sample likelihood alone. Instead, we would like to prefer models that have the fewest free parameters possible. But if we delete a free parameter that has a huge effect in the dataset (e.g., a big regression path), the fit will worsen substantially. This is the dilemma of fit versus parsimony, and the motivation for measures such as AIC and BIC that try to balance these considerations.
+
+(Some quotes from Hallquist & Pilkonis, 2010)
+
+## Efficiency (AIC)
+
+AIC is an asymptotically efficient criterion for model selection, which means that it tends to select the model that minimizes prediction error as sample size increases. More generally, AIC is an information criterion primarily concerned with minimizing the relative Kullback-Leibler (K-L) distance between a statistical model and the unknown mechanisms giving rise to the observed data (Claeskens & Hjort, 2008). 
+
+An underlying assumption of AIC is that the “truth” of the data is very complex (i.e., many causal factors of varying strengths) and that no one “true model” exists (Burnham & Anderson, 2002). Thus, AIC is useful for selecting the best approximate model using a finite number of parameters when “truth” is countably infinite.
+
+## Consistency (BIC)
+
+By contrast, the BIC originates from the Bayesian tradition in statistics and is concerned with the statistical property of consistency, which refers to the one “true model” being selected with increasing probability as sample size increases (Yang, 2005). Underlying the property of consistency are several assumptions worth examining: (1) a single “true” model exists that best represents the mechanisms that gave rise to the observed data, (2) one of the models in the set of models tested is the “true” model, and (3) the focus of model selection is to identify the “true” model rather than to provide a close approximation to the truth. Given these assumptions, Burnham and Anderson (2002) have argued against the use of consistent model selection criteria in the biological, medical, and social sciences because such data are highly complex, there is a low likelihood of including the “true model” in any set of models considered, and it is unlikely that a single “true model” exists.
+
+## Comparing models based on AIC or BIC differences
+
+Summarizing extensive simulation work, Burnham and Anderson (2002) offer useful rules-of-thumb for inferring the degree of certainty afforded to a particular model relative to the best fitting model in the set: 
+
+-  models within 0–2 points on the AIC also have substantial support
+-  models in the 4–7 point range have considerably less support
+-  models greater than 10 points apart have almost no support. 
+
+Moreover, AIC values for a set of models can be subtracted from the model with the lowest AIC value and these difference scores can be transformed into a set of Akaike weights that represent the evidential weight of a particular model relative to all other models in the set (Burnham & Anderson, 2002). The important general point is that conclusions drawn from latent variable models would benefit from being contextualized in terms of model selection uncertainty and the degree of support for one model over alternatives.
+
+For details on Akaike weights or evidence ratios, I would recommend checking out the `AICcmodavg` package and Burnham and Anderson's 2002 book. Briefly, the Akaike weight is the probability that model $i$ is the Kullback-Leibler best model in the set of models $I$ that we've tested. A K-L best model just means that the relative distance from the unknown truth is shortest, and thus its relative evidence is best, but the weight gives a sense of uncertainty in this judgment.
+
+```{r}
+aa <- aictab(list(first_order=l1fac_m, higher_order=hcfa_m))
+
+print(aa)
+```
+
+Returning to our first-order versus hierarchical factor model example, we see that the difference in AIC between these is 2.49, which would fall into the weak range of Burnham and Anderson's rules. The AIC weights sum to 1.0 and reveal here that the probability that the hierarchical model is the best in the set of tested models (here, two). A 78% probability isn't terrible, but it's not definitive either -- we should have some uncertainty about whether the hierarchical model is best. The fact that the hierarchical model is also more parsimonious may tilt our conclusions further in that direction.
+
+Furthermore, note that AIC weights do not consider the important possibility that there is another *untested* model that would capture the data far better. Thus, we must always remember that these measures provide relative evidnece of one model versus a set of tested alternatives, but not alternatives we failed to consider!
+
+Finally, we can take the ratios of AIC weights as an evidence ratio, which quantifies the ratio in favor of one model (with lower AIC) compared to another (higher AIC).
+
+```{r}
+evidence(aa)
+```
+Here, the ratio of evidence in favor of the higher-order factor models is 3.47x that of the first-order factor model. Many statisticians would prefer that such ratios (closely related to Bayes factors) are 10 or higher, minimally, to make strong claims that one model is better than another. But here, we could contextualize the evidence of the hierarhical model as "moderately" higher than the alternative, first-order model.
