@@ -57,4 +57,4 @@ If you already cloned a local copy of the repo, you can get the latest updates u
 10. Best practices, identifying problems, being effective
     - [Best practices](10_best_practices/best_practices.html)
     - [Odds and Ends: Ill Conditioning, Estimators, Categorical Data, Missing Data](10_best_practices/important_odds_and_ends.html)
-    
+    - [Example of SEM in the Real World](10_best_practices/pd_example.html)
