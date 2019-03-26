@@ -1,6 +1,6 @@
 ---
 title: "SEM Fit and Modification"
-subtitle: "PSY 597 Week 10"
+subtitle: "PSY 597 Week 8"
 author: "Michael Hallquist"
 date: "12 Mar 2019"
 output:

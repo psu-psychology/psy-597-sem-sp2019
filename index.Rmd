@@ -54,3 +54,7 @@ If you already cloned a local copy of the repo, you can get the latest updates u
     -  [Lecture](08_fit/sem_fit_modification.html)
 9.  Model comparison and relative evidence
     -  [Lecture](09_model_comparison/model_comparison.html)
+10. Best practices, identifying problems, being effective
+    - [Best practices](10_best_practices/best_practices.html)
+    - [Odds and Ends: Ill Conditioning, Estimators, Categorical Data, Missing Data](10_best_practices/important_odds_and_ends.html)
+    

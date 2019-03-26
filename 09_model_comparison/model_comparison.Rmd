@@ -1,6 +1,6 @@
 ---
 title: "Model comparison and evidence"
-subtitle: "PSY 597 Week 11"
+subtitle: "PSY 597 Week 9"
 author: "Michael Hallquist"
 date: "19 Mar 2019"
 output:
