@@ -47,7 +47,7 @@ semPaths_default <- function(lavObject, sizeMan=15, ...) {
 
 These are recommended practices in using SEM adapted and extended from Kline.
 
-#Model specification
+# Model specification
 
 -  Have a clear rationale for why SEM is the right tool for the job. Simpler is better: don't choose a multiple-groups path analysis using mean structure to capture differences between groups on a single observed variable if a two-sample *t*-test will do.
 
