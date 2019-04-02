@@ -344,7 +344,7 @@ l_CoAWe ~~ 1*l_CoAWe
 l_FoGWar ~~ l_CoAWe
 '
 
-msem_tau_coawe <- sem(msem_tau_coawe.syntax, simData)
+msem_tau_coawe <- cfa(msem_tau_coawe.syntax, simData)
 summary(msem_tau_coawe, fit.measures=TRUE, standardized=TRUE)
 ```
 
@@ -356,7 +356,9 @@ aictab(list(congeneric=msem, tau=msem_tau_coawe))
 fitMeasures(msem_tau_coawe)[c("chisq", "df", "pvalue", "rmsea", "srmr", "cfi")]
 ```
 
-Here, we see something perhaps less definitive: the LRT is barely significant (in our sample of 500), suggesting a failure of tau equivalence, but the AICc indicates that the tau equivalent model is nearly as good (difference of 1.7 points), and it is more parsimonious. We also find that the global fit measures are all acceptable. This highlights the problem with relying on NHST alone to judge constrained models. One should make an informed judgment based on a) LRT, b) changes in global fit measures (esp. change in CFI), c) change in residuals under the constrained solution, and d) interpretability.
+The tau-equivalent model fits significantly worse than the congeneric model. Moreover, the AIC difference is ~44.3 points, consistent with large differences in model evidence.
+
+Overall, we need to attend to global fit indices beyond NHST alone to judge constrained models. One should make an informed judgment based on a) LRT, b) changes in global fit measures (esp. change in CFI), c) change in residuals under the constrained solution, and d) interpretability.
 
 With regard to change in residuals, we can examine this in a few ways. I suggest looking at the absolute change in the residuals in correlational units.
 
@@ -370,13 +372,16 @@ In this case, I would at least consider the parallel model.
 
 ### Parallel
 
-In the parallel model, we add constraints on disturbances for the indicators (error variance). Let's apply these constraints to the tau-equivalent CoAWe model, leaving FoGWar as congeneric. Remember that we only consider the parallel model if the tau-equivalent step fits well.
+In the parallel model, we add constraints on disturbances for the indicators (error variance). Let's apply these constraints to the tau-equivalent CoAWe model, leaving FoGWar as congeneric. Remember that we only consider the parallel model if the tau-equivalent step fits well. (So here, we should have stopped above -- just continuing for didactic value.)
 
 ```{r}
 msem_parallel_coawe.syntax <- '
 l_FoGWar =~ FoGWar1 + FoGWar2 + FoGWar3 + FoGWar4  #equate loadings by using the same parameter label
 l_CoAWe =~ NA*CoAWe5 + f1*CoAWe5 + f1*CoAWe6 + f1*CoAWe7 + f1*CoAWe8
 
+
+l_FoGWar ~~ 1*l_FoGWar
+l_CoAWe ~~ 1*l_CoAWe
 l_FoGWar ~~ l_CoAWe
 
 #equate residual variances
