@@ -33,7 +33,7 @@ ol li { margin-top: 0.2em; margin-bottom: 0.2em; }
 
 ```{r setup, include=FALSE}
 if (!require(pacman)) { install.packages("pacman"); library(pacman) }
-p_load(knitr, MASS, tidyverse, viridis, lavaan, modelr, semPlot, psych, DiagrammeR, semTools, AICcmodavg)
+p_load(knitr, MASS, tidyverse, viridis, lavaan, modelr, semPlot, psych, DiagrammeR, semTools, AICcmodavg, ggcorrplot, dplyr)
 knitr::opts_chunk$set(echo = TRUE) #print code by default
 options(digits=3)
 set.seed(15092) #to make simulated data the same across computers
@@ -52,11 +52,11 @@ Up to this point in class, we have largely focused on understanding models of co
 
 Let's consider a few examples:
 
-1.  What is the mean difference in depression -- measuremed by a multi-item factor -- before and after cognitive behavior therapy?
-2.  How does the mean leve of conscientiousness (in a Big 5 sense) change over the life span in the population?
+1.  What is the mean difference in depression -- measured by a multi-item factor -- before and after cognitive behavior therapy?
+2.  How does the mean level of conscientiousness (in a Big 5 sense) change over the life span in the population?
 3.  Does a group who completes a mindfulness training show greater openness to experience than a group who completes a time management training?
 
-In the depression example, notice how we are leveraging the power of SEM by specifying a measurement model for depression, we handle measurement error formally when testing for mean change over time. This should both increase the precision of our estimate and reduce bias. This holds true for the conscientiousness question, too.
+In the depression example, notice how we are leveraging the power of SEM by specifying a measurement model for depression. This addresses measurement error formally (i.e., in the model) when testing for mean change over time. This should both increase the precision of our mean change estimate and reduce bias. This holds true for the conscientiousness question, too.
 
 In the third example (mindfulness), we are interested in comparing means on a latent variable (openness) between groups who were randomized to different conditions. Although such questions are often addressed by ANOVA or t-tests, we can capture a similar phenomenon in SEM, with the added advantage of accessing measurement models.
 
@@ -64,7 +64,7 @@ In the third example (mindfulness), we are interested in comparing means on a la
 
 ![](factor_model_with_means.png)
 
-Note that we use the triangle with a 1 inside to denote the regression of a variable (e.g., the factor scores) on a constant (1). 
+Here, we use the triangle with a 1 inside to denote the regression of a variable (e.g., the factor scores) on a constant (1). 
 
 When we regress any variable on a vector of 1s, we will obtain an expectation of its mean (assuming there are no other predictors).
 
@@ -152,11 +152,13 @@ The most common approach to examining the effect of constraints on fit is nested
 
 If the LRT/$\chi^2$ difference is significant (often $p < .05$), it indicates that the more constrained model fits significantly worse than the free model. But as we've discussed elsewhere, this test can become overpowered in large samples, so examining parameter differences in the free and constrained model is essential to get a sense of the practical differences. For example, if two factor loadings are 0.9 and 0.8 in the free case, but 0.86 in the constrained case, what would we do if the LRT had $p = .02$? How bad are residuals?
 
-Note that the effect of constraints (or dropping paths, for that matter) can also be quantified using a *Wald W* statistic. This estimates the expected *increase* in the model $\chi^2$ if the parameter constraints were to be introduced to a free model. This is asymptotically equivalent (i.e., as sample size increases) to the model chi-square difference test and the LRT under most scenarios. The practical advantage of a Wald test is that one can test the effect of constraints on a model without needing to refit the model or specify new syntax.
+Note that the effect of constraints (or dropping paths, for that matter) can also be quantified using a *Wald W* statistic. This estimates the expected *increase* in the model $\chi^2$ if the parameter constraints were to be introduced to a free model. This is asymptotically equivalent (i.e., as sample size increases) to the model chi-square difference test and the LRT under most scenarios. The practical advantage of a Wald test is that one can test the effect of constraints on a model without needing to refit the model or specify new syntax. This is particularly handy for models that are slow to estimate and thus, that you don't want to refit.
 
-Likewise, the modification index for a given path estimates the change in model $\chi^2$ if the path were included. It is based on the Lagrange multiplier test (LMT), which (in this context) is a test of whether a candidate omitted parameter is equal to zero. Remember that if we don't specify a parameter in the model (e.g., a cross-loading), it is assumed to be zero. Although the LMT is usually computed on individual parameters (e.g., the table of modification indices), one can compute an LMT on a set of tests such as the hypothesis that all five potential cross-loadings are zero. See `lavTestScore` for details.
+Unlike the Wald W statistic, which is usually used to examine how model fit *worsens* with the addition of constraints, a modification index for a given path estimates the *improvement* in model $\chi^2$ if the path were included. Thus, if we constrain a number of paths to be equal, then examine the modification indices, we may learn which paths are unlikely to be equal -- as indicated by a large modification index. 
 
-If you're curious about the relationships among these parameter equivalent testing approaches, see this: https://stats.idre.ucla.edu/other/mult-pkg/faq/general/faqhow-are-the-likelihood-ratio-wald-and-lagrange-multiplier-score-tests-different-andor-similar/.
+Modification indices are based on the Lagrange multiplier test (LMT), which (in this context) is a test of whether a candidate omitted parameter is equal to zero. Remember that if we don't specify a parameter in the model (e.g., a cross-loading), it is assumed to be zero. Although the LMT is usually computed on individual parameters (e.g., the table of modification indices), one can compute an LMT on a set of tests such as the hypothesis that all five potential cross-loadings are zero. See `lavTestScore` for details.
+
+If you're curious about the relationships among these parameter equivalence testing approaches, see this: https://stats.idre.ucla.edu/other/mult-pkg/faq/general/faqhow-are-the-likelihood-ratio-wald-and-lagrange-multiplier-score-tests-different-andor-similar/.
 
 ## How to test constraints in lavaan
 
@@ -189,7 +191,8 @@ CoAWe8 ~~ (1-.8^2)*CoAWe8
 # generate data; note, standardized lv is default
 simData <- lavaan::simulateData(demo.model, sample.nobs=500)
 
-round(cor(simData), 2)
+# round(cor(simData), 2)
+ggcorrplot(cor(simData))
 ```
 
 ```{r}
@@ -198,8 +201,11 @@ round(cor(simData), 2)
 #the second f1* provides a parameter label for the loading so we can constrain it later
 
 msem.syntax <- '
-l_FoGWar =~ NA*FoGWar1 + f1*FoGWar1 + f2*FoGWar2 + f3*FoGWar3 + f4*FoGWar4  #definition of factor FoGWar with loadings on 4 items
-l_CoAWe =~ NA*CoAWe5 + CoAWe6 + CoAWe7 + CoAWe8  #definition of factor CoAWe with loadings on 4 items
+#definition of factor FoGWar with loadings on 4 items
+l_FoGWar =~ NA*FoGWar1 + f1*FoGWar1 + f2*FoGWar2 + f3*FoGWar3 + f4*FoGWar4
+
+#definition of factor CoAWe with loadings on 4 items
+l_CoAWe =~ NA*CoAWe5 + CoAWe6 + CoAWe7 + CoAWe8
 
 #unit variance identification (since we want to compare all factor loadings)
 l_FoGWar ~~ 1*l_FoGWar
@@ -236,7 +242,7 @@ Here, we find a significant *p*-value, suggesting that the fit is significantly 
 
 ### Likelihood ratio test / model chi-square difference test
 
-The `anova` function in `lavaan` will compute the LRT for nested models. It requires the researcher to fit two nested models, then compare them. Here, we can fit the equality constrained model:
+The `anova` function in `lavaan` will compute the LRT for nested models. It requires the researcher to fit two nested models, then compare them. Here, we can fit the constrained model where the loadings for all items on FoGWar are equal.
 
 ```{r}
 msem_eq.syntax <- '
@@ -247,6 +253,18 @@ l_FoGWar ~~ 1*l_FoGWar
 l_CoAWe ~~ 1*l_CoAWe
 l_FoGWar ~~ l_CoAWe
 '
+
+#same model, but using unit loading identification (ULI) approach
+# msem_eq.syntax <- '
+# #equate loadings by using the same parameter label
+# l_FoGWar =~ f1*FoGWar1 + f1*FoGWar2 + f1*FoGWar3 + f1*FoGWar4  
+# 
+# l_CoAWe =~ NA*CoAWe5 + CoAWe6 + CoAWe7 + CoAWe8
+# 
+# l_FoGWar ~~ l_FoGWar #free factor variance
+# l_CoAWe ~~ 1*l_CoAWe
+# l_FoGWar ~~ l_CoAWe
+# '
 
 msem_eq <- sem(msem_eq.syntax, simData) #standardize factor variances to avoid first loading at 1.0.
 #summary(msem_eq, fit.measures=TRUE)
@@ -261,7 +279,9 @@ By using the same parameter label `f1`, `lavaan` constrains those parameters to 
 anova(msem, msem_eq)
 ```
 
-We see the same effect for the LRT as the Wald test (no surprise there), suggesting worse fit under constrained loadings.
+We see the same effect for the LRT as the Wald test (no surprise there), suggesting worse fit under constrained loadings. 
+
+Altogether, note that we achieved two hypothesis tests using different means. In the `lavTestScore` approach, we compute the *decrease* in fit (as indicated by higher $\chi^2$) when we constrain FoGWar factor loadings to be equal based on a model in which the loadings are freely estimated. In the conventional LRT or $\chi^2$ difference test, we fit both the free and constrained models and test the difference in fit based on difference in likelihoods.
 
 # Constraints in measurement models: congeneric, tau equivalent, and parallel specifications
 
@@ -279,6 +299,8 @@ The first type of factor model is called *congeneric*. This is what we've come t
 4.  Indicators load onto only one latent variable (no cross-loadings)
 
 Under these assumptions, the observed correlations among indicators reflect the influence of the latent variables, but we do not assume that a) the proportion of true score (factor score) variance is equal across indicators, or that b) that the latent construct scales with item responses equally.
+
+The congeneric model is not guaranteed. For example, if we have 'complex indicators' that have cross loadings, or if there are correlated errors among indicators, this does not satisfy congenericity.
 
 ## Tau equivalent
 
@@ -316,33 +338,63 @@ Though we didn't use the nomenclature, our initial two-factor CFA model with fre
 summary(msem, standardized=TRUE)
 ```
 
+Here, we have labeled the factor loadings for FoGWar, but we have not constrained them to be equal.
+
 Note that the loadings for FoGWar are similar, but perhaps not equivalent. They range from .64 to .82. The question of tau equivalence is whether the loadings can be constrained to equality without reducing fit substantially. As we saw above, by using the same parameter loading for a set of indicators, `lavaan` will enforce an equality constraint.
 
 ### Tau equivalent
 
-Above, we tested a model in which we equated FoGWar loadings. As a reminder:
+Above, we tested a model in which we equated FoGWar loadings. This is the tau equivalent model (for FoGWar, anyhow). As a reminder, the syntax looks like this:
+
+```
+msem_eq.syntax <- '
+  #equate loadings by using the same parameter label
+  l_FoGWar =~ NA*FoGWar1 + f1*FoGWar1 + f1*FoGWar2 + f1*FoGWar3 + f1*FoGWar4  
+  l_CoAWe =~ NA*CoAWe5 + CoAWe6 + CoAWe7 + CoAWe8
+  
+  l_FoGWar ~~ 1*l_FoGWar
+  l_CoAWe ~~ 1*l_CoAWe
+  l_FoGWar ~~ l_CoAWe
+'
+```
+
+As noted above, the premultiplication of `FoGWar1` by `NA` instructs `lavaan` to free the loading for the first indicator (as opposed to fixing it to 1.0). And the second premultiplication by `f1` instructs lavaan to fix all parameters (here FoGWar loadings) with the same `f1` label to be equal. This is the unit variance identification (UVI) approach. Look in the R code above for the unit loading identification (ULI) approach, which is commented out.
+
+Here is the fit of the tau equivalent model:
 
 ```{r}
 summary(msem_eq, standardized=TRUE)
 ```
 
+And the LRT:
+
 ```{r}
 anova(msem, msem_eq)
 ```
 
-The LRT suggested that model fit worsened when FoGWar loadings were equated.
+This recapitulates what we already reviewed above, but without calling the models congeneric and tau equivalent. As a reminder, the LRT suggested that model fit worsened when FoGWar loadings were equated.
 
-What about testing tau-equivalence for CoAWe?
+**What about testing tau equivalence for CoAWe?**
+
+The tests above suggest that tau equivalence does not hold for FoGWar, but perhaps it does for CoAWe.
 
 ```{r}
 msem_tau_coawe.syntax <- '
-l_FoGWar =~ FoGWar1 + FoGWar2 + FoGWar3 + FoGWar4  #equate loadings by using the same parameter label
+l_FoGWar =~ NA*FoGWar1 + FoGWar2 + FoGWar3 + FoGWar4  #equate loadings by using the same parameter label
 l_CoAWe =~ NA*CoAWe5 + f1*CoAWe5 + f1*CoAWe6 + f1*CoAWe7 + f1*CoAWe8
 
 l_FoGWar ~~ 1*l_FoGWar
 l_CoAWe ~~ 1*l_CoAWe
 l_FoGWar ~~ l_CoAWe
 '
+
+#ULI approach -- same model
+# msem_tau_coawe.syntax <- '
+# l_FoGWar =~ FoGWar1 + FoGWar2 + FoGWar3 + FoGWar4  #equate loadings by using the same parameter label
+# l_CoAWe =~ f1*CoAWe5 + f1*CoAWe6 + f1*CoAWe7 + f1*CoAWe8
+# 
+# l_FoGWar ~~ l_CoAWe
+# '
 
 msem_tau_coawe <- cfa(msem_tau_coawe.syntax, simData)
 summary(msem_tau_coawe, fit.measures=TRUE, standardized=TRUE)
@@ -352,15 +404,20 @@ Let's compare to the congeneric model using an LRT. The tau equivalent model is 
 
 ```{r}
 anova(msem, msem_tau_coawe)
+```
+
+The LRT suggests that the tau equivalent model is barely worse ($p = .04$) than the congeneric.
+
+```{r}
 aictab(list(congeneric=msem, tau=msem_tau_coawe))
 fitMeasures(msem_tau_coawe)[c("chisq", "df", "pvalue", "rmsea", "srmr", "cfi")]
 ```
 
-The tau-equivalent model fits significantly worse than the congeneric model. Moreover, the AIC difference is ~44.3 points, consistent with large differences in model evidence.
+With the relative evidence approach, we see something perhaps less definitive: the LRT is barely significant (in our sample of 500), suggesting a failure of tau equivalence, but the AICc indicates that the tau equivalent model is nearly as good (difference of 1.7 points), and it is more parsimonious. We also find that the global fit measures are all acceptable.
 
-Overall, we need to attend to global fit indices beyond NHST alone to judge constrained models. One should make an informed judgment based on a) LRT, b) changes in global fit measures (esp. change in CFI), c) change in residuals under the constrained solution, and d) interpretability.
+This highlights the problem with relying on null hypothesis significance testing (NHST) alone to judge constrained models. One should make an informed judgment based on a) LRT, b) changes in global fit measures (esp. change in CFI), c) change in residuals under the constrained solution, and d) interpretability.
 
-With regard to change in residuals, we can examine this in a few ways. I suggest looking at the absolute change in the residuals in correlational units.
+With regard to change in residuals, we can examine this in a few ways. I suggest looking at the absolute change in the residuals in correlational units. This captures the absolute difference between the congeneric and tau equivalent models (for CoAWe) in terms of fitting each cell of the covariance matrix. Note that the FoGWar residual differences should be zero because the models being compared are the same for this factor -- they only differ in CoAWe.
 
 ```{r}
 abs(resid(msem, type="cor")$cov - resid(msem_tau_coawe, type="cor")$cov)
@@ -372,13 +429,12 @@ In this case, I would at least consider the parallel model.
 
 ### Parallel
 
-In the parallel model, we add constraints on disturbances for the indicators (error variance). Let's apply these constraints to the tau-equivalent CoAWe model, leaving FoGWar as congeneric. Remember that we only consider the parallel model if the tau-equivalent step fits well. (So here, we should have stopped above -- just continuing for didactic value.)
+In the parallel model, we add constraints on disturbances for the indicators (error variances). Let's apply these constraints to the tau-equivalent CoAWe model, leaving FoGWar as congeneric. Remember that we only consider the parallel model if the tau-equivalent step fits well.
 
 ```{r}
 msem_parallel_coawe.syntax <- '
-l_FoGWar =~ FoGWar1 + FoGWar2 + FoGWar3 + FoGWar4  #equate loadings by using the same parameter label
+l_FoGWar =~ NA*FoGWar1 + FoGWar2 + FoGWar3 + FoGWar4  #equate loadings by using the same parameter label
 l_CoAWe =~ NA*CoAWe5 + f1*CoAWe5 + f1*CoAWe6 + f1*CoAWe7 + f1*CoAWe8
-
 
 l_FoGWar ~~ 1*l_FoGWar
 l_CoAWe ~~ 1*l_CoAWe
@@ -389,7 +445,6 @@ CoAWe5 ~~ rv1*CoAWe5
 CoAWe6 ~~ rv1*CoAWe6
 CoAWe7 ~~ rv1*CoAWe7
 CoAWe8 ~~ rv1*CoAWe8
-
 '
 
 msem_parallel_coawe <- sem(msem_parallel_coawe.syntax, simData)
@@ -416,6 +471,8 @@ fitMeasures(msem_parallel_coawe)[c("chisq", "df", "pvalue", "rmsea", "srmr", "cf
 
 AIC also suggests that the models all fit the data similarly. The parallel model is actually quite close to the congeneric case in the fit:parsimony tradeoff that AICc represents (remember its 'efficiency' property).
 
+Altogether, this is a judgment call (as often happens in practice). I would err on the side of parsimony, potentially preferring the parallel model where the loadings and residual variances are equated. But I would want to make sure that I'm not missing any key covariance patterns that the congeneric model captures.
+
 # Multiple groups
 
 So far, we have primarily considered constraints in the context of a single sample, enforcing equality on different parameters in the model. Oftentimes, however, we are faced with questions in which we a) have multiple distinct groups or samples, or b) hypothesize that a categorical moderator may affect some of the parameters in our model. In either case, this is typically a multiple-groups problem in which we are interested in understanding how well a given SEM fits independent samples of data.
@@ -426,16 +483,23 @@ Let's consider the example from the `lavaan` tutorial: http://lavaan.ugent.be/tu
 
 ```{r}
 data(HolzingerSwineford1939)
-describeBy(HolzingerSwineford1939, HolzingerSwineford1939$school)
+lapply(describeBy(HolzingerSwineford1939, HolzingerSwineford1939$school), function(df) {
+  select(df, -trimmed, -vars, -se, -mad)
+})
+  
 ```
 
 The variables `x1-x3` are indicators of visual processing, `x4-x6` reflect textual processing, and `x7-x9` measure processing speed.
 
 ## Fitting groups (schools) separately
 
+Let's start by fitting SEMs to each school separately. We would not normally do this in practice given the advantages of testing multiple groups in one SEM. But it is useful to see how this works.
+
 Here is the fit of a three-factor model to each group.
 
 ### Pasteur
+
+We subset the data to Pasteur alone, then fit the CFA.
 
 ```{r}
 HS.model <- '  visual =~ x1 + x2 + x3
@@ -448,6 +512,8 @@ semPaths_default(fit_pasteur)
 ```
 
 ### Grant-White
+
+Now the same for Grant-White, fitting the CFA after subsetting the data.
 
 ```{r}
 ### Grant-White
@@ -466,13 +532,17 @@ fit_combined <- cfa(HS.model, data = HolzingerSwineford1939, group="school", mea
 summary(fit_combined, fit.measures=TRUE, standardized=TRUE)
 ```
 
-We are now provided with parameter estimates for each group. We also have the $\chi^2$ contribution of each group to the total model $\chi^2$. Notice that the $\chi^2$ for each group is identical to the $\chi^2$ obtained when we fit the samples independently. Thus, the jumping off point for most multiple-group analyses is a free model in which all parameters are estimated uniquely in each group. 
+We are now provided with parameter estimates for each group. We also have the $\chi^2$ contribution of each group to the total model $\chi^2$. Notice that the $\chi^2$ for each group is identical to the $\chi^2$ obtained when we fit the samples independently. Thus, the jumping off point for most multiple-group analyses is a free model in which all parameters are estimated uniquely in each group.
+
+Also note that the model degrees of freedom is 48, whereas the individual school fits were 24 df each. Thus, in the multiple-groups model with no constraints, the $\chi^2$ is the sum of the individual group model $\chi^2$ values. Likewise, the degrees of freedom in the multiple-groups case is the sum of the individual group model dfs.
 
 This model specification essentially looks like this:
 
 ![](two_groups.png){width=800px}
 
-The free model is not very parsimonious, however, nor does it usually address our substantive research questions. In fact, we are often interested in testing the hypothesis that the latent structure (or at least part of it) is equivalent across groups. If we translate a measure of personality from English to Dutch, it would be ideal if the latent structure was the same in both populations. This would let us compare results across nations without concern that the tests are measuring different constructs in each nation. Likewise, if we wish to compare rates of change in aggressive behaviors between prison and psychiatric settings, we wish to test a hypothesis about relative equality in change parameters across settings.
+Note that the model is partitioned by group. No person was observed in both schools, and thus, we would never consider whether the `Vis` factor in Pasteur correlates with the `Vis` factor in Grant-White. Rather, in multiple-groups SEM, we are interested in testing how multiple covariance matrices (one per group) are explained by a SEM that has as many parameters in common as fits well.
+
+The free model is not very parsimonious, nor does it usually address our substantive research questions. In fact, we are often interested in testing the hypothesis that the latent structure (or at least part of it) is equivalent across groups. If we translate a measure of personality from English to Dutch, it would be ideal if the latent structure was the same in both populations. This would let us compare results across nations without concern that the tests are measuring different constructs in each nation. Likewise, if we wish to compare rates of change in aggressive behaviors between prison and psychiatric settings, we wish to test a hypothesis about relative equality in change parameters across settings.
 
 ```{r}
 inspect(fit_combined)
@@ -505,7 +575,9 @@ The `measEq.syntax` function from the `semTools` package provides a convenient w
 
 Integrating (blurring?) over a huge swath of literature, I would recommend satisfying at least *strong* invariance if you want to compare groups on factor means, variance, or covariances. There is less general support for requiring strict invariance, since that essentially forces the uniqueness of each item (i.e., variance not attributable to the factor) to be the same across groups. This also implies equal reliability across groups, assuming equal factor variances. There is not a huge conceptual gain in demonstrating strict MI for most applications, in my opinion.
 
-Note, here, the use of the `compareFit` function from `semTools`. This provides a broader set of summary statistics when comparing the global fit of multiple models. To use it, we must pass in a named list of fitted lavaan models. Also note the use of the `nested` argument. If `TRUE`, `compareFit` will conduct LRTs on our behalf to test chi-square differences.
+Increasingly, change in CFI, not LRT significance, is seen as a sensitive test of measurement noninvariance (i.e., that the measure functions differntly in some way by group). Cheung and Rensvold, 2002, *Structural Equation Modeling* suggest that an increase in CFI of .01 between a more constrained model (e.g., strong invariance) and a less constrained model (e.g., weak invariance) may indicate measurement *noninvariance*. Meade, Johnson, and Braddy (2008) found that CFI changes as little as .002 may be indicative of a problem with invariance.
+
+Here, we will initially stick to LRT. We will use the `compareFit` function from `semTools`. This provides a broader set of summary statistics when comparing the global fit of multiple models. To use it, we must pass in a named list of fitted lavaan models. Also note the use of the `nested` argument. If `TRUE`, `compareFit` will conduct LRTs on our behalf to test chi-square differences.
 
 ```{r}
 to_constrain <- c("configural", "loadings", "intercepts", "residuals", "means")
@@ -572,7 +644,6 @@ Let's check the parameter matrices for the UVI weak invariance model:
 ```{r}
 inspect(mweak_uvi)
 ```
-
 
 And we can inspect the fit:
 
