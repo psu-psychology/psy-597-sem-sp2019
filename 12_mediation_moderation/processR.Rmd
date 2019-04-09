@@ -1,0 +1,96 @@
+---
+title: "R package processR"
+author: "Keon-Woong Moon"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{processR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,comment=NA,message=FALSE,
+                      warning=FALSE,
+                      fig.height=5,fig.width=7,
+                      fig.align="center")
+```
+
+The `processR` package aims to be a user-friendly way to perform moderation, mediation, moderated mediation and moderated moderation in R. This package is inspired from famous PROCESS macro for SPSS and SAS created by Andrew Hayes.
+
+## PROCESS macro and R package `processR`
+
+Andrew F. Hayes was not involved in the development of this R package or application and cannot attest to the quality of the computations implemented in the code you are using. Use at your own risk.
+
+## Installation
+
+You can install the `processR` package from github.
+
+```{r,eval=TRUE}
+if(!require(devtools)) install.packages("devtools")
+devtools::install_github("cardiomoon/predict3d")
+devtools::install_github("cardiomoon/processR")
+```
+ 
+## What does this package cover ? 
+
+The `processR` package covers moderation, mediation, moderated mediation and moderated moderation with R. Supporting models are as follows.
+
+```{r}
+library(processR)
+sort(pmacro$no)
+```
+
+Currently, `r length(pmacro$no)` models are supported.
+
+## Example: Moderated Mediation (PROCESS macro model 8)
+
+I will explain functions of processR package by a example.
+
+## Concept Diagram and Statistical Diagram
+
+You can draw concept diagram and statistical diagram easily. For example, you can draw the concept diagram for PROCESS macro model 8.
+
+```{r}
+pmacroModel(8)
+```
+
+You can draw statistical diagram of this model.
+
+```{r}
+statisticalDiagram(8)
+```
+
+## Make model equation for analysis
+
+This package uses `lavaan` and `mediation` packages for analysis. The `lavaan` package is extremely customizable and can also model latent variables if your measurement model requires it. But it is difficult to figure out the model equation for analysis. You can make model equation easily. For example, if you want to perform moderated mediation with data `disaster` with the following concept model.
+
+```{r}
+labels=list(X="frame",M="justify",Y="donate",W="skeptic")
+pmacroModel(8,labels=labels)
+```
+
+There is one moderator `skeptic` in this model. The moderating site is "a" and "c". You can make model equation by the following command.
+
+```{r}
+moderator=list(name="skeptic",site=list(c("a","c")))
+model=tripleEquation(X="frame",M="justify",Y="donate",moderator=moderator)
+cat(model)
+```
+
+## Full vignette
+
+You can see full vignette for model 8 at http://rpubs.com/cardiomoon/468602
+
+## Shiny App
+
+I have developed a shiny app. You can test the app at http://web-r.space:3838/processR.
+I will appreciate any comment.
+
+## How to perform this analysis with shiny app
+
+You can see how to perform this analysis at http://rpubs.com/cardiomoon/468600
+
+## Sample powerpoint file
+
+In the shiny app, you can download the analysis results as a powerpoint file. You can download the sample file [model8.pptx](https://github.com/cardiomoon/processRDocs/blob/master/model8/model8.pptx?raw=true) - view with [office web viewer](https://view.officeapps.live.com/op/view.aspx?src=https://github.com/cardiomoon/processRDocs/blob/master/model8/model8.pptx?raw=true). 
