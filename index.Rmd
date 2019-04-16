@@ -63,3 +63,4 @@ If you already cloned a local copy of the repo, you can get the latest updates u
     - [Lecture](12_mediation_moderation/mediation_moderation.html)
     - [Demo](12_mediation_moderation/mediation_moderation_demo.html)
     - [processR Vignette](12_mediation_moderation/processR.html)
+13. [Q&A](13_qa_writeup/13_qa.html)
