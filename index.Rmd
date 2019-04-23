@@ -64,3 +64,5 @@ If you already cloned a local copy of the repo, you can get the latest updates u
     - [Demo](12_mediation_moderation/mediation_moderation_demo.html)
     - [processR Vignette](12_mediation_moderation/processR.html)
 13. [Q&A](13_qa_writeup/13_qa.html)
+14. [Longitudinal SEM](14_longitudinal/growth_modeling.html)
+15. [Multilevel SEM](15_multilevel/multilevel_sem.html)
