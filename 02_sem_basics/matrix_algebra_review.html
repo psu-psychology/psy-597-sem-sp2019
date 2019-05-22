@@ -233,7 +233,7 @@ window.initializeCodeFolding = function(show) {
   var currentIndex = 1;
 
   // select all R code blocks
-  var rCodeBlocks = $('pre.r, pre.python, pre.bash, pre.sql, pre.cpp, pre.stan');
+  var rCodeBlocks = $('pre.r, pre.python, pre.bash, pre.sql, pre.cpp, pre.stan, pre.julia');
   rCodeBlocks.each(function() {
 
     // create a collapsable div to wrap the code in
@@ -2598,9 +2598,7 @@ h6 {
 </style>
 
 
-</head>
 
-<body>
 
 <style type="text/css">
 .main-container {
@@ -2625,16 +2623,78 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
 
-<div class="container-fluid main-container">
-
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
 });
 </script>
 
@@ -2649,6 +2709,14 @@ $(document).ready(function () {
 </script>
 
 
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
 
 
 
@@ -2666,9 +2734,9 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">Matrix Algebra Overview</h1>
-<h3 class="subtitle"><em>PSY 597 Week 2</em></h3>
-<h4 class="author"><em>Michael Hallquist</em></h4>
-<h4 class="date"><em>15 Jan 2019</em></h4>
+<h3 class="subtitle">PSY 597 Week 2</h3>
+<h4 class="author">Michael Hallquist</h4>
+<h4 class="date">15 Jan 2019</h4>
 
 </div>
 
@@ -2730,8 +2798,8 @@ Y;
 edge [color=gray50 style=filled]
 X1 -&gt; Y; X2 -&gt; Y; X3 -&gt; Y;
 }&quot;)</code></pre>
-<div id="htmlwidget-56d2a8d790b26e4c3b0a" style="width:672px;height:480px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-56d2a8d790b26e4c3b0a">{"x":{"diagram":"digraph DAG {\n\ngraph [rankdir = LR bgcolor=transparent]\n\nnode [shape = square, fontcolor=gray25 color=gray80]\n\nnode [fontname=\"Helvetica\"]\nX1 [label=<X<sub>1<\/sub>>]; X2 [label=<X<sub>2<\/sub>>]; X3 [label=<X<sub>3<\/sub>>]; \n\nnode [fillcolor=gray90 style=filled]\nY;\n\nedge [color=gray50 style=filled]\nX1 -> Y; X2 -> Y; X3 -> Y;\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-0c57d4f22b0d8cb9c149" style="width:672px;height:480px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0c57d4f22b0d8cb9c149">{"x":{"diagram":"digraph DAG {\n\ngraph [rankdir = LR bgcolor=transparent]\n\nnode [shape = square, fontcolor=gray25 color=gray80]\n\nnode [fontname=\"Helvetica\"]\nX1 [label=<X<sub>1<\/sub>>]; X2 [label=<X<sub>2<\/sub>>]; X3 [label=<X<sub>3<\/sub>>]; \n\nnode [fillcolor=gray90 style=filled]\nY;\n\nedge [color=gray50 style=filled]\nX1 -> Y; X2 -> Y; X3 -> Y;\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>But one could easily have two criterion variables that are predicted by the same predictors. For example, how do sex, age, and education predict cognitive functioning and physical disability?</p>
 <pre class="r"><code>grViz(&quot;digraph DAG {
 
@@ -2749,8 +2817,8 @@ edge [color=gray50 style=filled]
 Age -&gt; Cog_Fun; Educ -&gt; Cog_Fun; Sex -&gt; Cog_Fun;
 Age -&gt; Phys_Dis; Educ -&gt; Phys_Dis; Sex -&gt; Phys_Dis;
 }&quot;)</code></pre>
-<div id="htmlwidget-266be8d0a22ce97e062c" style="width:672px;height:480px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-266be8d0a22ce97e062c">{"x":{"diagram":"digraph DAG {\n\ngraph [rankdir = LR bgcolor=transparent]\n\nnode [shape = box, fontcolor=gray25 color=gray80]\n\nnode [fontname=\"Helvetica\"]\nAge; Educ; Sex; \n\nnode [fillcolor=gray90 style=filled]\nCog_Fun Phys_Dis;\n\nedge [color=gray50 style=filled]\nAge -> Cog_Fun; Educ -> Cog_Fun; Sex -> Cog_Fun;\nAge -> Phys_Dis; Educ -> Phys_Dis; Sex -> Phys_Dis;\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-bea5a0849fb595158c62" style="width:672px;height:480px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-bea5a0849fb595158c62">{"x":{"diagram":"digraph DAG {\n\ngraph [rankdir = LR bgcolor=transparent]\n\nnode [shape = box, fontcolor=gray25 color=gray80]\n\nnode [fontname=\"Helvetica\"]\nAge; Educ; Sex; \n\nnode [fillcolor=gray90 style=filled]\nCog_Fun Phys_Dis;\n\nedge [color=gray50 style=filled]\nAge -> Cog_Fun; Educ -> Cog_Fun; Sex -> Cog_Fun;\nAge -> Phys_Dis; Educ -> Phys_Dis; Sex -> Phys_Dis;\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>In conventional regression, one could simply think of this as two regression equations implemented in separate models, one for cognitive function, one for physical disability. This, however, does now handle a number of possibilities, such as the importance of a relationship between cognitive function and disability. Perhaps these are correlated outcomes for important conceptual reasons.</p>
 <p>Furthermore, an important idea in SEM is that any variable in the covariance matrix could potentially serve as both criterion and predictor. Consider a mediation model related to the example above:</p>
 <pre class="r"><code>grViz(&quot;digraph DAG {
@@ -2769,8 +2837,8 @@ edge [color=gray50 style=filled]
 Age -&gt; Phys_Dis; Educ -&gt; Phys_Dis; Sex -&gt; Phys_Dis;
 Phys_Dis -&gt; Cog_Fun;
 }&quot;)</code></pre>
-<div id="htmlwidget-0fea4aaf0389236b757f" style="width:672px;height:480px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-0fea4aaf0389236b757f">{"x":{"diagram":"digraph DAG {\n\ngraph [rankdir = LR bgcolor=transparent]\n\nnode [shape = box, fontcolor=gray25 color=gray80]\n\nnode [fontname=\"Helvetica\"]\nAge; Educ; Sex;\n\nnode [fillcolor=gray90 style=filled]\nCog_Fun Phys_Dis;\n\nedge [color=gray50 style=filled]\nAge -> Phys_Dis; Educ -> Phys_Dis; Sex -> Phys_Dis;\nPhys_Dis -> Cog_Fun;\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-59a5517e2802589aa7d4" style="width:672px;height:480px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-59a5517e2802589aa7d4">{"x":{"diagram":"digraph DAG {\n\ngraph [rankdir = LR bgcolor=transparent]\n\nnode [shape = box, fontcolor=gray25 color=gray80]\n\nnode [fontname=\"Helvetica\"]\nAge; Educ; Sex;\n\nnode [fillcolor=gray90 style=filled]\nCog_Fun Phys_Dis;\n\nedge [color=gray50 style=filled]\nAge -> Phys_Dis; Educ -> Phys_Dis; Sex -> Phys_Dis;\nPhys_Dis -> Cog_Fun;\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>In this model, the effects of background variables (age, sex, education) on cognitive functioning are entirely mediated by physical disability. This is a stronger hypothesis, but it all relates to the original covariance matrix of these data. That is, does this model provide a good representation of the <em>structure</em> of the covariance matrix?</p>
 </div>
 <div id="types-of-matrices" class="section level1">
@@ -2852,20 +2920,20 @@ Phys_Dis -&gt; Cog_Fun;
 <p>Here’s a square matrix</p>
 <pre class="r"><code>A &lt;- matrix(rnorm(25), nrow=5, ncol=5)
 print(A)</code></pre>
-<pre><code>##        [,1]   [,2]   [,3]   [,4]   [,5]
-## [1,] -0.420 -1.040 -1.554 -0.586 -0.871
-## [2,]  0.405  1.329 -0.552  1.322 -1.589
-## [3,]  0.163  0.343 -2.212 -1.727 -0.546
-## [4,] -0.176  1.360 -1.084  0.562  1.074
-## [5,] -0.736 -1.933 -0.106 -1.056  1.728</code></pre>
+<pre><code>##        [,1]  [,2]   [,3]   [,4]   [,5]
+## [1,] -1.653 0.651 -0.384 -1.909 -0.204
+## [2,]  0.959 0.324 -0.477 -1.458 -0.786
+## [3,] -0.961 0.310 -0.997 -0.843  0.966
+## [4,]  0.120 0.209 -0.398  1.815 -0.753
+## [5,]  0.694 0.119  0.396  0.153  1.317</code></pre>
 <p>And now multiplied by <span class="math inline">\(\mathbf{I}\)</span>:</p>
 <pre class="r"><code>A %*% diag(5)</code></pre>
-<pre><code>##        [,1]   [,2]   [,3]   [,4]   [,5]
-## [1,] -0.420 -1.040 -1.554 -0.586 -0.871
-## [2,]  0.405  1.329 -0.552  1.322 -1.589
-## [3,]  0.163  0.343 -2.212 -1.727 -0.546
-## [4,] -0.176  1.360 -1.084  0.562  1.074
-## [5,] -0.736 -1.933 -0.106 -1.056  1.728</code></pre>
+<pre><code>##        [,1]  [,2]   [,3]   [,4]   [,5]
+## [1,] -1.653 0.651 -0.384 -1.909 -0.204
+## [2,]  0.959 0.324 -0.477 -1.458 -0.786
+## [3,] -0.961 0.310 -0.997 -0.843  0.966
+## [4,]  0.120 0.209 -0.398  1.815 -0.753
+## [5,]  0.694 0.119  0.396  0.153  1.317</code></pre>
 </div>
 </div>
 <div id="matrix-addition-and-subtraction" class="section level1">
@@ -3123,7 +3191,7 @@ SE_{M} = \frac{s}{\sqrt{N}}
 <p><span class="math display">\[
 \hat{\sigma}^2 = \frac{ \sum_{i=1}^{N}(y_i - \hat{y}_i)^2 } {N - p - 1}
 \]</span></p>
-<p>Note that <span class="math inline">\(\sigma^2\)</span> is also known as mean squared error, which related back to the idea of partition the total sum of squares into the parts accounted for in the model versus residual, unaccounted for variance:</p>
+<p>Note that <span class="math inline">\(\sigma^2\)</span> is also known as mean squared error (MSE), which relates back to the idea of partitioning the total sum of squares into the parts accounted for by the model versus residual, unaccounted for variance:</p>
 <p><span class="math display">\[
 \begin{align}
 SS_\textrm{Total} &amp;= \sum_{i=1}^{N}({y_i - \bar{y}})^2 \\

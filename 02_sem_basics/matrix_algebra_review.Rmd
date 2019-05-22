@@ -490,7 +490,7 @@ $$
 \hat{\sigma}^2 = \frac{ \sum_{i=1}^{N}(y_i - \hat{y}_i)^2 } {N - p - 1}
 $$
 
-Note that $\sigma^2$ is also known as mean squared error, which related back to the idea of partition the total sum of squares into the parts accounted for in the model versus residual, unaccounted for variance:
+Note that $\sigma^2$ is also known as mean squared error (MSE), which relates back to the idea of partitioning the total sum of squares into the parts accounted for by the model versus residual, unaccounted for variance:
 
 $$
 \begin{align}
